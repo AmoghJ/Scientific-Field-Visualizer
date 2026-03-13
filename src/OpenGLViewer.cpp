@@ -281,15 +281,22 @@ void OpenGLViewer::updateViewportSize(int w, int h) {
     width = w;
     height = h;
 
-    std::cout << w << " " << h << std::endl;
-
     glBindTexture(GL_TEXTURE_2D, renderTex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, renderFbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    Notify<ViewerResizeEvent>({ width, height });
 }
 
 void OpenGLViewer::update() {
@@ -323,32 +330,22 @@ void OpenGLViewer::update() {
         }
 
         
+        ImVec2 contentSize = ImGui::GetContentRegionAvail();
+        ImVec2 renderSize = ImVec2(contentSize.x, contentSize.y);
+
+        updateViewportSize((int)renderSize.x, (int)renderSize.y);
 
         ImVec2 pos = ImGui::GetCursorScreenPos();
-
-        updateViewportSize(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
-
-        float winHeight = ImGui::GetWindowSize().y;
-        float imgRatio = float(width) / float(height);
-        float scaledImageWidth = imgRatio * winHeight;
-
-        // Center image in content region
-        float startPos = pos.x + (ImGui::GetContentRegionAvail().x - scaledImageWidth) * 0.5f;
-
-        ImVec2 minRect = ImVec2(startPos, pos.y);
-        ImVec2 maxRect = ImVec2(startPos + scaledImageWidth, pos.y + winHeight);
-
-        // Draw image
         ImGui::GetWindowDrawList()->AddImage(
             (ImTextureID)(getTextureID()),
-            minRect,
-            maxRect,
+            pos,
+            ImVec2(pos.x + (float)width, pos.y + (float)height),
             ImVec2(0, 1),
             ImVec2(1, 0)
         );
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
-        ImGui::BeginChild("##Transfer Function", ImVec2(ImGui::GetContentRegionAvail().x, 50.0f), true);
+        ImGui::BeginChild("##Transfer Function", ImVec2(contentSize.x, 58.0f), true);
         ImGui::Text("Visualization Function:");
         
         ImGui::SetNextItemWidth(200.0f);

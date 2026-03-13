@@ -8,6 +8,10 @@ struct CameraMoveEvent {
 	glm::mat4 mvp;
 };
 
+struct ViewerResizeEvent {
+	int width, height;
+};
+
 struct LeftMouseDragEvent {
 	float dX, dY;
 };
