@@ -70,4 +70,8 @@ private:
 
 	float scalarRange[2] = { 0.0f, 1.0f };
 	GLuint rangeMinLocation, rangeMaxLocation;
+
+	bool showIsoline = false;
+	float isolineValue = 0.5f;
+	GLuint isolineBoolLocation, isolineValueLocation;
 };

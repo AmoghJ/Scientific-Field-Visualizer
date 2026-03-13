@@ -273,6 +273,8 @@ void OpenGLViewer::updateShader() {
     wireframeToggleLocation = glGetUniformLocation(shader, "uWireframe");
     rangeMinLocation = glGetUniformLocation(shader, "uRangeMin");
     rangeMaxLocation = glGetUniformLocation(shader, "uRangeMax");
+    isolineBoolLocation = glGetUniformLocation(shader, "uIsoline");
+    isolineValueLocation = glGetUniformLocation(shader, "uIsolineValue");
 }
 
 void OpenGLViewer::updateViewportSize(int w, int h) {
@@ -394,6 +396,17 @@ void OpenGLViewer::update() {
         ImGui::Text("|");
         ImGui::SameLine(0.0f, 25.0f);
 
+        ImGui::Checkbox("Isoline", &showIsoline);
+        if (showIsoline) {
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(100.0f);
+            ImGui::SliderFloat("Value", &isolineValue, 0.0f, 1.0f, "%.2f");
+        }
+
+        ImGui::SameLine(0.0f, 25.0f);
+        ImGui::Text("|");
+        ImGui::SameLine(0.0f, 25.0f);
+
         ImGui::Checkbox("Wireframe", &wireframe);
 
         ImGui::EndChild(); //Transfer Function
@@ -425,6 +438,8 @@ void OpenGLViewer::render() {
     glUniform1i(wireframeToggleLocation, wireframe);
     glUniform1f(rangeMinLocation, scalarRange[0]);
     glUniform1f(rangeMaxLocation, scalarRange[1]);
+    glUniform1i(isolineBoolLocation, showIsoline);
+    glUniform1f(isolineValueLocation, isolineValue);
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, numVertices);
