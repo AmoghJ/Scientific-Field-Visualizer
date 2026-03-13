@@ -24,12 +24,18 @@
     <ClCompile Include="src\Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Fonts.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Console.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,8 +1,10 @@
 #include <iostream>
 #include "Window.h"
+#include "Console.h"
 
 void loop() {
 
+    Console::Draw();
 }
 
 int main()
