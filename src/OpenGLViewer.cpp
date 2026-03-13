@@ -299,26 +299,18 @@ void OpenGLViewer::updateViewportSize(int w, int h) {
     Notify<ViewerResizeEvent>({ width, height });
 }
 
+static bool dragStartedInViewer = false;
+
 void OpenGLViewer::update() {
 
     //View Window
     {
         ImGui::Begin("Viewer", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-        
+        ImVec2 contentSize = ImGui::GetContentRegionAvail();
+        updateViewportSize((int)contentSize.x, (int)contentSize.y);
+
         //Mouse input handling
-
-        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-            ImVec2 mDel = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
-            Notify<LeftMouseDragEvent>(LeftMouseDragEvent(mDel.x, mDel.y));
-            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Left);
-        }
-
-        if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
-            ImVec2 mDel = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right);
-            Notify<RightMouseDragEvent>(RightMouseDragEvent(mDel.x, mDel.y));
-            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
-        }
 
         { //Implemented scroll handling in dirty way - to prevent message queue from flooding
             float scrollY = ImGui::GetIO().MouseWheel;
@@ -329,11 +321,29 @@ void OpenGLViewer::update() {
             }
         }
 
-        
-        ImVec2 contentSize = ImGui::GetContentRegionAvail();
-        ImVec2 renderSize = ImVec2(contentSize.x, contentSize.y);
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) ||
+            ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            dragStartedInViewer = ImGui::IsWindowHovered();
+        }
 
-        updateViewportSize((int)renderSize.x, (int)renderSize.y);
+        if (dragStartedInViewer) {
+            if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+                ImVec2 mDel = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
+                Notify<LeftMouseDragEvent>(LeftMouseDragEvent(mDel.x, mDel.y));
+                ImGui::ResetMouseDragDelta(ImGuiMouseButton_Left);
+            }
+            if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
+                ImVec2 mDel = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right);
+                Notify<RightMouseDragEvent>(RightMouseDragEvent(mDel.x, mDel.y));
+                ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+            }
+        }
+
+        
+        //ImVec2 contentSize = ImGui::GetContentRegionAvail();
+        //ImVec2 renderSize = ImVec2(contentSize.x, contentSize.y);
+
+        //updateViewportSize((int)renderSize.x, (int)renderSize.y);
 
         ImVec2 pos = ImGui::GetCursorScreenPos();
         ImGui::GetWindowDrawList()->AddImage(

@@ -13,6 +13,7 @@ OrbitCamera::OrbitCamera(Container* cont) : Component(cont) {
 
     Subscribe<ViewerResizeEvent>([this](const ViewerResizeEvent& rs) {
         setPerspective(45.0f, (float)rs.width / (float)rs.height, 0.01f, 1000.0f);
+        updateView();
     });
 
     Subscribe<LeftMouseDragEvent>([this](const LeftMouseDragEvent& mD) {
