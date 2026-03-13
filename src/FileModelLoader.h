@@ -2,9 +2,11 @@
 
 #include "IModelData.h"
 
+class Container;
+
 class FileModelLoader : public IModelData {
 public:
-	FileModelLoader();
+	FileModelLoader(Container* cont);
 	~FileModelLoader();
 
 	void renderGUI() override;

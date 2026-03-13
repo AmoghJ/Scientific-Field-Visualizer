@@ -95,7 +95,7 @@ OpenGLViewer::~OpenGLViewer() {
 void OpenGLViewer::init() {
 
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);  // Additive blending
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //Fbo and texture setup
     {
@@ -125,41 +125,66 @@ void OpenGLViewer::init() {
         //Bounding Cube
         {
             float cubeVertices[] = {
-                // x     y     z
-                0.0f, 0.0f, 0.0f,  // 0 left  bottom back
-                1.0f, 0.0f, 0.0f,  // 1 right bottom back
-                1.0f, 1.0f, 0.0f,  // 2 right top    back
-                0.0f, 1.0f, 0.0f,  // 3 left  top    back
-                0.0f, 0.0f, 1.0f,  // 4 left  bottom front
-                1.0f, 0.0f, 1.0f,  // 5 right bottom front
-                1.0f, 1.0f, 1.0f,  // 6 right top    front
-                0.0f, 1.0f, 1.0f,  // 7 left  top    front
+                // back face
+                0,0,0,  1,0,0,  1,1,0,
+                1,1,0,  0,1,0,  0,0,0,
+                // front face
+                0,0,1,  1,1,1,  1,0,1,
+                1,1,1,  0,0,1,  0,1,1,
+                // left face
+                0,0,0,  0,1,1,  0,0,1,
+                0,1,1,  0,0,0,  0,1,0,
+                // right face
+                1,0,0,  1,0,1,  1,1,1,
+                1,1,1,  1,1,0,  1,0,0,
+                // top face
+                0,1,0,  1,1,1,  0,1,1,
+                1,1,1,  0,1,0,  1,1,0,
+                // bottom face
+                0,0,0,  0,0,1,  1,0,1,
+                1,0,1,  1,0,0,  0,0,0,
             };
 
-            unsigned int cubeIndices[] = {
-                0, 1, 2,  2, 3, 0,  // back
-                4, 6, 5,  6, 4, 7,  // front  (winding flipped vs back)
-                0, 3, 7,  7, 4, 0,  // left
-                1, 5, 6,  6, 2, 1,  // right
-                3, 2, 6,  6, 7, 3,  // top
-                0, 4, 5,  5, 1, 0,  // bottom
+            float cubeNormals[] = {
+                // back face
+                0,0,-1,  0,0,-1,  0,0,-1,
+                0,0,-1,  0,0,-1,  0,0,-1,
+                // front face
+                0,0,1,   0,0,1,   0,0,1,
+                0,0,1,   0,0,1,   0,0,1,
+                // left face
+                -1,0,0,  -1,0,0,  -1,0,0,
+                -1,0,0,  -1,0,0,  -1,0,0,
+                // right face
+                1,0,0,   1,0,0,   1,0,0,
+                1,0,0,   1,0,0,   1,0,0,
+                // top face
+                0,1,0,   0,1,0,   0,1,0,
+                0,1,0,   0,1,0,   0,1,0,
+                // bottom face
+                0,-1,0,  0,-1,0,  0,-1,0,
+                0,-1,0,  0,-1,0,  0,-1,0,
             };
 
             glGenVertexArrays(1, &vao);
             glGenBuffers(1, &vbo);
-            glGenBuffers(1, &ebo);
+            glGenBuffers(1, &nVbo);
 
             glBindVertexArray(vao);
 
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_DYNAMIC_DRAW);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(0);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, nVbo);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeNormals), cubeNormals, GL_DYNAMIC_DRAW);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(1);
 
             glBindVertexArray(0);
+
+            numVertices = 36;
         }
     }
 
@@ -182,6 +207,19 @@ void OpenGLViewer::init() {
             reloadShader = true;
         });
     }
+
+
+    //Subscribe to mesh data event and update buffer
+    Subscribe<MeshData>([this](const MeshData& mD) {
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, mD.pos->size() * sizeof(glm::vec3), mD.pos->data(), GL_DYNAMIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, nVbo);
+        glBufferData(GL_ARRAY_BUFFER, mD.normals->size() * sizeof(glm::vec3), mD.normals->data(), GL_DYNAMIC_DRAW);
+
+        numVertices = mD.pos->size();
+    });
 }
 
 void OpenGLViewer::updateShader() {
@@ -296,6 +334,7 @@ void OpenGLViewer::render() {
     glBindFramebuffer(GL_FRAMEBUFFER, renderFbo);
     glViewport(0, 0, width, height);
     glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1.0f);
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(shader);
@@ -303,7 +342,7 @@ void OpenGLViewer::render() {
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, numVertices);
     glBindVertexArray(0);
 
     glUseProgram(0);

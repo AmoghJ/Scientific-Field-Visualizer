@@ -1,36 +1,31 @@
 #pragma once
 
 #include <memory>
+#include <functional>
 #include "IModelData.h"
 #include <string>
 #include <map>
 
-struct IMarchingCubesGenerator {
+class Container;
 
-};
-
-struct TorusGenerator : public IMarchingCubesGenerator {
-
-};
-
-struct GyroidGenerator : public IMarchingCubesGenerator {
-
-};
+using GeneratorFunction = std::function<float(glm::vec3)>;
 
 class MarchingCubes : public IModelData {
 
 	float cellSize = 1.0f;
+	float isolevel = 0.5f;
 
 	std::string generatorLabels[2];
 	enum Generators {
 		Torus, Gyroid
 	} currentGenerator;
 
-	IMarchingCubesGenerator* selectedGenerator;
-	std::map<Generators, std::unique_ptr<IMarchingCubesGenerator>> generators;
+	std::map<Generators, GeneratorFunction> generators;
+
+	void updateMarchingCube();
 
 public:
-	MarchingCubes();
+	MarchingCubes(Container* cont);
 	~MarchingCubes();
 
 	void renderGUI() override;

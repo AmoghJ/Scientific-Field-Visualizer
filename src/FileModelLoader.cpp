@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 
-FileModelLoader::FileModelLoader() {
+FileModelLoader::FileModelLoader(Container* cont) : IModelData(cont) {
 
 }
 

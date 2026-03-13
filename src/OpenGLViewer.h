@@ -50,7 +50,9 @@ private:
 	void updateShader();
 	void updateViewportSize(int width, int height);
 
-	GLuint vao, vbo, ebo;
+	GLuint vao, vbo, nVbo;
+
+	int numVertices = 0;
 
 	GLuint mvpLocation;
 	glm::mat4 mvp; //Local copy of mvp matrix - update when camera sends event

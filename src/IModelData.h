@@ -3,9 +3,11 @@
 #include <vector>
 #include <glm/glm.hpp>
 
-class IModelData {
+#include "Component.h"
+
+class IModelData : public Component {
 public:
-	IModelData() {}
+	IModelData(Container* cont) : Component(cont) {}
 	virtual ~IModelData() = default;
 
 	std::vector<glm::vec3> vertexPos;
