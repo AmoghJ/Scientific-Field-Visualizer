@@ -270,6 +270,7 @@ void OpenGLViewer::updateShader() {
 
     mvpLocation = glGetUniformLocation(shader, "uMVP");
     colorMapSelectorLocation = glGetUniformLocation(shader, "uColorMap");
+    wireframeToggleLocation = glGetUniformLocation(shader, "uWireframe");
 }
 
 void OpenGLViewer::updateViewportSize(int w, int h) {
@@ -355,11 +356,10 @@ void OpenGLViewer::update() {
         );
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
-        ImGui::BeginChild("##Transfer Function", ImVec2(contentSize.x, 58.0f), true);
-        ImGui::Text("Visualization Function:");
-        
-        ImGui::SetNextItemWidth(200.0f);
-        if (ImGui::BeginCombo("##Vis Function", transferFuncLabels[int(currentTransferFunc)].c_str())) {
+        ImGui::BeginChild("##Transfer Function", ImVec2(contentSize.x, 38.0f), true);
+
+        ImGui::SetNextItemWidth(80.0f);
+        if (ImGui::BeginCombo("Visualization", transferFuncLabels[int(currentTransferFunc)].c_str())) {
 
             for (int i = 0; i < int(3); ++i) {
                 bool is_selected = (currentTransferFunc == TransferFunctions(i));
@@ -376,6 +376,12 @@ void OpenGLViewer::update() {
             }
             ImGui::EndCombo();
         }
+
+        ImGui::SameLine(0.0f, 25.0f);
+        ImGui::Text("|");
+
+        ImGui::SameLine(0.0f, 25.0f);
+        ImGui::Checkbox("Wireframe", &wireframe);
 
         ImGui::EndChild(); //Transfer Function
         ImGui::PopStyleColor();
@@ -403,6 +409,7 @@ void OpenGLViewer::render() {
 
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
     glUniform1i(colorMapSelectorLocation, currentTransferFunc);
+    glUniform1i(wireframeToggleLocation, wireframe);
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, numVertices);

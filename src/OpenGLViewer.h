@@ -64,4 +64,7 @@ private:
 	enum TransferFunctions {
 		Viridis, Jet, Turbo
 	} currentTransferFunc;
+
+	bool wireframe = true;
+	GLuint wireframeToggleLocation;
 };

@@ -350,6 +350,9 @@ MarchingCubes::~MarchingCubes() {
 
 }
 
+//TODO: Use compute shaders for marching cube
+//TODO: Displacement overlay
+//TODO: Isoline rendering for user defined values
 void MarchingCubes::updateMarchingCube() {
 
     vertexPos.clear();
