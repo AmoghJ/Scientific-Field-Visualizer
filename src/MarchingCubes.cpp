@@ -433,9 +433,13 @@ void MarchingCubes::updateMarchingCube() {
 
                 /* Create the triangle */
                 for (int i = 0; triTable[cubeindex][i] != -1;i += 3) {
-                    vertexPos.push_back(vertlist[triTable[cubeindex][i]] - glm::vec3(32.0f)); //subtracting 32 to center vertices to origin
-                    vertexPos.push_back(vertlist[triTable[cubeindex][i + 1]] - glm::vec3(32.0f));
-                    vertexPos.push_back(vertlist[triTable[cubeindex][i + 2]] - glm::vec3(32.0f));
+                    glm::vec3 v1 = vertlist[triTable[cubeindex][i]] - glm::vec3(32.0f);
+                    glm::vec3 v2 = vertlist[triTable[cubeindex][i + 1]] - glm::vec3(32.0f);
+                    glm::vec3 v3 = vertlist[triTable[cubeindex][i + 2]] - glm::vec3(32.0f);
+
+                    vertexPos.push_back(v1); //subtracting 32 to center vertices to origin
+                    vertexPos.push_back(v2);
+                    vertexPos.push_back(v3);
 
                     glm::vec3 n = calcNormal(
                         vertlist[triTable[cubeindex][i]],
@@ -446,9 +450,20 @@ void MarchingCubes::updateMarchingCube() {
                     vertexNormal.push_back(-n); //Normals were inverted for some reason
                     vertexNormal.push_back(-n);
                     vertexNormal.push_back(-n);
+                    
                 }
             }
         }
+    }
+}
+
+void MarchingCubes::updateScalarField() {
+
+    scalarField.clear();
+    ScalarFunc scalarFunction = functionsArray[selectedFunction];
+
+    for (glm::vec3& p : vertexPos) {
+        scalarField.push_back(scalarFunction(p));
     }
 }
 
@@ -484,12 +499,36 @@ void MarchingCubes::renderGUI() {
             std::string(" using marching cubes..."));
 
         updateMarchingCube();
+        updateScalarField();
 
         Console::Log(std::string("Finished generating ") + 
             std::string(generatorLabels[currentGenerator])); //TODO: Add time taken to finish
 
         //Notify main component that we have finished loading mesh
-        //TODO: Need to add scalar field data
         Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField));
+    }
+
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::Spacing();
+
+    ImGui::Text("Field Function");
+    if (ImGui::BeginCombo("##Select Field Function", scalarFuncLabels[int(selectedFunction)].c_str())) {
+
+        for (int i = 0; i < int(7); ++i) {
+            bool is_selected = (selectedFunction == i);
+            if (ImGui::Selectable(scalarFuncLabels[i].c_str(), is_selected)) {
+
+                if (selectedFunction != i) {
+                    selectedFunction = i;
+                    updateScalarField();
+                    Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField));
+                }
+
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
     }
 }

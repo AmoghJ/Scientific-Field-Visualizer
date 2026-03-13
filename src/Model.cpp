@@ -44,7 +44,9 @@ void Model::guiRender() {
             ImGui::EndCombo();
         }
 
+        ImGui::Spacing();
         ImGui::Separator();
+        ImGui::Spacing();
         //Model Loader specific UI
         if(currentModelLoader != nullptr)
             currentModelLoader->renderGUI();

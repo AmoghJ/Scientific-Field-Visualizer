@@ -23,6 +23,7 @@ class MarchingCubes : public IModelData {
 	std::map<Generators, GeneratorFunction> generators;
 
 	void updateMarchingCube();
+	void updateScalarField(); //Helper to only update scalar field
 
 public:
 	MarchingCubes(Container* cont);

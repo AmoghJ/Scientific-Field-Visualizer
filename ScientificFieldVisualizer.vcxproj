@@ -28,6 +28,7 @@
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OpenGLViewer.cpp" />
     <ClCompile Include="src\OrbitCamera.cpp" />
+    <ClCompile Include="src\ScalarMaps.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +45,7 @@
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\OpenGLViewer.h" />
     <ClInclude Include="src\OrbitCamera.h" />
+    <ClInclude Include="src\ScalarMaps.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

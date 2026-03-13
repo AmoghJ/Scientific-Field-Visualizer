@@ -45,6 +45,9 @@
     <ClCompile Include="src\FileModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ScalarMaps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\FileModelLoader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ScalarMaps.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

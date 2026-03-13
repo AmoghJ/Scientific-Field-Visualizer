@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "Component.h"
+#include "ScalarMaps.h"
 
 class IModelData : public Component {
 public:
@@ -13,6 +14,8 @@ public:
 	std::vector<glm::vec3> vertexPos;
 	std::vector<glm::vec3> vertexNormal;
 	std::vector<float> scalarField;
+
+	int selectedFunction = 0;
 
 	virtual void renderGUI() = 0;
 };
