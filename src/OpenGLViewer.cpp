@@ -271,6 +271,8 @@ void OpenGLViewer::updateShader() {
     mvpLocation = glGetUniformLocation(shader, "uMVP");
     colorMapSelectorLocation = glGetUniformLocation(shader, "uColorMap");
     wireframeToggleLocation = glGetUniformLocation(shader, "uWireframe");
+    rangeMinLocation = glGetUniformLocation(shader, "uRangeMin");
+    rangeMaxLocation = glGetUniformLocation(shader, "uRangeMax");
 }
 
 void OpenGLViewer::updateViewportSize(int w, int h) {
@@ -379,8 +381,19 @@ void OpenGLViewer::update() {
 
         ImGui::SameLine(0.0f, 25.0f);
         ImGui::Text("|");
+        ImGui::SameLine(0.0f, 25.0f);
+
+        ImGui::SetNextItemWidth(240.0f);
+        ImGui::DragFloatRange2("Range", &scalarRange[0], &scalarRange[1],
+            0.005f,   // drag speed
+            0.0f,     // min limit
+            1.0f,     // max limit
+            "Min: %.2f", "Max: %.2f");
 
         ImGui::SameLine(0.0f, 25.0f);
+        ImGui::Text("|");
+        ImGui::SameLine(0.0f, 25.0f);
+
         ImGui::Checkbox("Wireframe", &wireframe);
 
         ImGui::EndChild(); //Transfer Function
@@ -410,6 +423,8 @@ void OpenGLViewer::render() {
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
     glUniform1i(colorMapSelectorLocation, currentTransferFunc);
     glUniform1i(wireframeToggleLocation, wireframe);
+    glUniform1f(rangeMinLocation, scalarRange[0]);
+    glUniform1f(rangeMaxLocation, scalarRange[1]);
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, numVertices);

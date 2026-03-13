@@ -67,4 +67,7 @@ private:
 
 	bool wireframe = true;
 	GLuint wireframeToggleLocation;
+
+	float scalarRange[2] = { 0.0f, 1.0f };
+	GLuint rangeMinLocation, rangeMaxLocation;
 };
