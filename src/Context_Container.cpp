@@ -1,6 +1,6 @@
 #include "Context_Container.h"
 
-Context::Context() : viewer(this) {
+Context::Context() : viewer(this), camera(this) {
 
 }
 

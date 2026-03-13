@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "GL/glew.h"
 #include <string>
+#include <glm/glm.hpp>
 
 #include "FileMonitor.h"
 
@@ -18,6 +19,9 @@ class Container;
 */
 class OpenGLViewer : public Component {
 public:
+
+	glm::vec3 backgroundColor;
+
 	OpenGLViewer(Container* cont);
 	~OpenGLViewer();
 
@@ -44,6 +48,10 @@ private:
 	bool reloadShader = true;
 
 	void updateShader();
+	void updateViewportSize(int width, int height);
 
 	GLuint vao, vbo, ebo;
+
+	GLuint mvpLocation;
+	glm::mat4 mvp; //Local copy of mvp matrix - update when camera sends event
 };

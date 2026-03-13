@@ -24,6 +24,7 @@
     <ClCompile Include="src\Font.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OpenGLViewer.cpp" />
+    <ClCompile Include="src\OrbitCamera.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -31,9 +32,11 @@
     <ClInclude Include="src\Console.h" />
     <ClInclude Include="src\Container.h" />
     <ClInclude Include="src\Context_Container.h" />
+    <ClInclude Include="src\Events.h" />
     <ClInclude Include="src\FileMonitor.h" />
     <ClInclude Include="src\Fonts.h" />
     <ClInclude Include="src\OpenGLViewer.h" />
+    <ClInclude Include="src\OrbitCamera.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

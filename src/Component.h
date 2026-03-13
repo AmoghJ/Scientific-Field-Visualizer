@@ -28,5 +28,4 @@ protected:
 
 public:
     virtual ~Component() {}
-    virtual void draw() {}
 };

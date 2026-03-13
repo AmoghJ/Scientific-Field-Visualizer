@@ -8,6 +8,10 @@
 #include "Console.h"
 #include "FileMonitor.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Events.h"
+
 // Standard functions for compiling and creating shaders
 GLuint CompileShader(GLenum type, const std::string& source)
 {
@@ -74,6 +78,14 @@ GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& frag
 OpenGLViewer::OpenGLViewer(Container* cont) : Component(cont) {
     width = 720;
     height = 720;
+
+    //default background color - hardcoded for now
+    backgroundColor = glm::vec3(0.1f);
+
+    //Get camera move events
+    Subscribe<CameraMoveEvent>([this](const CameraMoveEvent& cm) {
+        mvp = cm.mvp; //Update local mvp
+    });
 }
 
 OpenGLViewer::~OpenGLViewer() {
@@ -110,36 +122,45 @@ void OpenGLViewer::init() {
 
     //Test render setup
     {
-        float quadVertices[] = {
-        -1.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-         1.0f, -1.0f, 1.0f, 0.0f, // bottom-right
-        -1.0f,  1.0f, 0.0f, 1.0f, // top-left
-         1.0f,  1.0f, 1.0f, 1.0f  // top-right
-        };
+        //Bounding Cube
+        {
+            float cubeVertices[] = {
+                // x     y     z
+                0.0f, 0.0f, 0.0f,  // 0 left  bottom back
+                1.0f, 0.0f, 0.0f,  // 1 right bottom back
+                1.0f, 1.0f, 0.0f,  // 2 right top    back
+                0.0f, 1.0f, 0.0f,  // 3 left  top    back
+                0.0f, 0.0f, 1.0f,  // 4 left  bottom front
+                1.0f, 0.0f, 1.0f,  // 5 right bottom front
+                1.0f, 1.0f, 1.0f,  // 6 right top    front
+                0.0f, 1.0f, 1.0f,  // 7 left  top    front
+            };
 
-        unsigned int indices[] = {
-            0, 1, 2,
-            2, 1, 3
-        };
+            unsigned int cubeIndices[] = {
+                0, 1, 2,  2, 3, 0,  // back
+                4, 6, 5,  6, 4, 7,  // front  (winding flipped vs back)
+                0, 3, 7,  7, 4, 0,  // left
+                1, 5, 6,  6, 2, 1,  // right
+                3, 2, 6,  6, 7, 3,  // top
+                0, 4, 5,  5, 1, 0,  // bottom
+            };
 
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vbo);
-        glGenBuffers(1, &ebo);
+            glGenVertexArrays(1, &vao);
+            glGenBuffers(1, &vbo);
+            glGenBuffers(1, &ebo);
 
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+            glBindVertexArray(vao);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(0);
 
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
 
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-        glBindVertexArray(0);
+            glBindVertexArray(0);
+        }
     }
 
     updateShader();
@@ -184,14 +205,46 @@ void OpenGLViewer::updateShader() {
     }
 
     reloadShader = false;
+
+    mvpLocation = glGetUniformLocation(shader, "uMVP");
+}
+
+void OpenGLViewer::updateViewportSize(int w, int h) {
+
+    //Only run function if update is necessary
+    if (w == width && h == height)
+        return;
+
+    width = w;
+    height = h;
+
+    glBindTexture(GL_TEXTURE_2D, renderTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OpenGLViewer::update() {
 
     //View Window
     {
-        ImGui::Begin("Viewer", NULL);//, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus);
+        ImGui::Begin("Viewer", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus);
+
         ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 mDel = ImGui::GetMouseDragDelta();
+        float scrollY = ImGui::GetIO().MouseWheel;
+
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+            Notify<MouseDragEvent>(MouseDragEvent(mDel.x, mDel.y));
+        }
+
+        ImGui::ResetMouseDragDelta();
+
+        updateViewportSize(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
+
         float winHeight = ImGui::GetWindowSize().y;
         float imgRatio = float(width) / float(height);
         float scaledImageWidth = imgRatio * winHeight;
@@ -224,13 +277,15 @@ void OpenGLViewer::render() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, renderFbo);
     glViewport(0, 0, width, height);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(shader);
 
+    glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
+
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     glUseProgram(0);
