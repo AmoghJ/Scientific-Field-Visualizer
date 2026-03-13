@@ -54,4 +54,6 @@ private:
 
 	GLuint mvpLocation;
 	glm::mat4 mvp; //Local copy of mvp matrix - update when camera sends event
+
+	float lastScrollY = 0.0f; //TODO: Need better workaround, right now doing dirty way to save time
 };

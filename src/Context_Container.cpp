@@ -1,6 +1,6 @@
 #include "Context_Container.h"
 
-Context::Context() : viewer(this), camera(this) {
+Context::Context() : viewer(this), camera(this), model(this) {
 
 }
 
@@ -13,6 +13,8 @@ void Context::init() {
 }
 
 void Context::loop() {
+
+	model.guiRender();
 
 	viewer.update();
 	viewer.render();

@@ -36,6 +36,15 @@
     <ClCompile Include="src\OrbitCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MarchingCubes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileModelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -66,6 +75,18 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Events.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IModelData.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MarchingCubes.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileModelLoader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

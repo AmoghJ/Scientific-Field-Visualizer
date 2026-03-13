@@ -1,5 +1,7 @@
 #include "OrbitCamera.h"
 
+#include <iostream>
+
 OrbitCamera::OrbitCamera(Container* cont) : Component(cont) { 
 
     setPerspective(45.0f, 1280.0f / 720.0f, 0.01f, 1000.0f);
@@ -9,8 +11,16 @@ OrbitCamera::OrbitCamera(Container* cont) : Component(cont) {
 
     updateView();
 
-    Subscribe<MouseDragEvent>([this](const MouseDragEvent& mD) {
+    Subscribe<LeftMouseDragEvent>([this](const LeftMouseDragEvent& mD) {
         orbit(mD.dX, mD.dY);
+    });
+
+    Subscribe<RightMouseDragEvent>([this](const RightMouseDragEvent& mD) {
+       pan(mD.dX, mD.dY);
+    });
+
+    Subscribe<MouseScrollEvent>([this](const MouseScrollEvent& sc) {
+        zoom(sc.scrollY);
     });
 }
 OrbitCamera::~OrbitCamera() {}
@@ -73,7 +83,7 @@ void OrbitCamera::setPitchLimits(float minPitch, float maxPitch) {
 // Left-mouse drag — rotates around target
 void OrbitCamera::orbit(float deltaX, float deltaY) {
     m_yaw += deltaX * m_orbitSensitivity;
-    m_pitch -= deltaY * m_orbitSensitivity;   // subtract: drag up = pitch up
+    m_pitch += deltaY * m_orbitSensitivity;   // subtract: drag up = pitch up
     m_pitch = glm::clamp(m_pitch, m_minPitch, m_maxPitch);
     updateView();
 }

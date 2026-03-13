@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "glm/glm.hpp"
 
 struct CameraMoveEvent {
@@ -7,6 +8,20 @@ struct CameraMoveEvent {
 	glm::mat4 mvp;
 };
 
-struct MouseDragEvent {
+struct LeftMouseDragEvent {
 	float dX, dY;
+};
+
+struct RightMouseDragEvent {
+	float dX, dY;
+};
+
+struct MouseScrollEvent {
+	float scrollY;
+};
+
+struct MeshData {
+	std::vector<glm::vec3>* pos;
+	std::vector<glm::vec3>* normals;
+	std::vector<float>* scalarField;
 };

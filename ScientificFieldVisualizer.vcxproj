@@ -21,8 +21,11 @@
   <ItemGroup>
     <ClCompile Include="src\Console.cpp" />
     <ClCompile Include="src\Context_Container.cpp" />
+    <ClCompile Include="src\FileModelLoader.cpp" />
     <ClCompile Include="src\Font.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MarchingCubes.cpp" />
+    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OpenGLViewer.cpp" />
     <ClCompile Include="src\OrbitCamera.cpp" />
     <ClCompile Include="src\Window.cpp" />
@@ -33,8 +36,12 @@
     <ClInclude Include="src\Container.h" />
     <ClInclude Include="src\Context_Container.h" />
     <ClInclude Include="src\Events.h" />
+    <ClInclude Include="src\FileModelLoader.h" />
     <ClInclude Include="src\FileMonitor.h" />
     <ClInclude Include="src\Fonts.h" />
+    <ClInclude Include="src\IModelData.h" />
+    <ClInclude Include="src\MarchingCubes.h" />
+    <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\OpenGLViewer.h" />
     <ClInclude Include="src\OrbitCamera.h" />
     <ClInclude Include="src\Window.h" />

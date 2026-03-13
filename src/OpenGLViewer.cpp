@@ -233,15 +233,33 @@ void OpenGLViewer::update() {
     {
         ImGui::Begin("Viewer", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-        ImVec2 pos = ImGui::GetCursorScreenPos();
-        ImVec2 mDel = ImGui::GetMouseDragDelta();
-        float scrollY = ImGui::GetIO().MouseWheel;
+        
+        //Mouse input handling
 
         if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-            Notify<MouseDragEvent>(MouseDragEvent(mDel.x, mDel.y));
+            ImVec2 mDel = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
+            Notify<LeftMouseDragEvent>(LeftMouseDragEvent(mDel.x, mDel.y));
+            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Left);
         }
 
-        ImGui::ResetMouseDragDelta();
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
+            ImVec2 mDel = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right);
+            Notify<RightMouseDragEvent>(RightMouseDragEvent(mDel.x, mDel.y));
+            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+        }
+
+        { //Implemented scroll handling in dirty way - to prevent message queue from flooding
+            float scrollY = ImGui::GetIO().MouseWheel;
+
+            if (scrollY != lastScrollY) {
+                Notify<MouseScrollEvent>(MouseScrollEvent(scrollY));
+                lastScrollY = scrollY;
+            }
+        }
+
+        
+
+        ImVec2 pos = ImGui::GetCursorScreenPos();
 
         updateViewportSize(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
 
@@ -263,9 +281,9 @@ void OpenGLViewer::update() {
             ImVec2(0, 1),
             ImVec2(1, 0)
         );
-
-        ImGui::End();
     }
+
+    ImGui::End();
 
 }
 

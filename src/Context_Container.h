@@ -4,6 +4,7 @@
 
 #include "OpenGLViewer.h"
 #include "OrbitCamera.h"
+#include "Model.h"
 
 /*
 * The context class binds the model, view, and controller together. It
@@ -17,6 +18,7 @@ class Context : public Container {
 private:
 	OpenGLViewer viewer;
 	OrbitCamera camera;
+	Model model;
 
 public:
 	Context();
