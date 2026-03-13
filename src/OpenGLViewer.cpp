@@ -126,23 +126,23 @@ void OpenGLViewer::init() {
         {
             float cubeVertices[] = {
                 // back face
-                0,0,0,  1,0,0,  1,1,0,
-                1,1,0,  0,1,0,  0,0,0,
-                // front face
-                0,0,1,  1,1,1,  1,0,1,
-                1,1,1,  0,0,1,  0,1,1,
-                // left face
-                0,0,0,  0,1,1,  0,0,1,
-                0,1,1,  0,0,0,  0,1,0,
-                // right face
-                1,0,0,  1,0,1,  1,1,1,
-                1,1,1,  1,1,0,  1,0,0,
-                // top face
-                0,1,0,  1,1,1,  0,1,1,
-                1,1,1,  0,1,0,  1,1,0,
-                // bottom face
-                0,0,0,  0,0,1,  1,0,1,
-                1,0,1,  1,0,0,  0,0,0,
+                -0.5f,-0.5f,-0.5f,  0.5f,-0.5f,-0.5f,  0.5f, 0.5f,-0.5f,
+                 0.5f, 0.5f,-0.5f, -0.5f, 0.5f,-0.5f, -0.5f,-0.5f,-0.5f,
+                 // front face
+                 -0.5f,-0.5f, 0.5f,  0.5f, 0.5f, 0.5f,  0.5f,-0.5f, 0.5f,
+                  0.5f, 0.5f, 0.5f, -0.5f,-0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
+                  // left face
+                  -0.5f,-0.5f,-0.5f, -0.5f, 0.5f, 0.5f, -0.5f,-0.5f, 0.5f,
+                  -0.5f, 0.5f, 0.5f, -0.5f,-0.5f,-0.5f, -0.5f, 0.5f,-0.5f,
+                  // right face
+                   0.5f,-0.5f,-0.5f,  0.5f,-0.5f, 0.5f,  0.5f, 0.5f, 0.5f,
+                   0.5f, 0.5f, 0.5f,  0.5f, 0.5f,-0.5f,  0.5f,-0.5f,-0.5f,
+                   // top face
+                   -0.5f, 0.5f,-0.5f,  0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
+                    0.5f, 0.5f, 0.5f, -0.5f, 0.5f,-0.5f,  0.5f, 0.5f,-0.5f,
+                    // bottom face
+                    -0.5f,-0.5f,-0.5f, -0.5f,-0.5f, 0.5f,  0.5f,-0.5f, 0.5f,
+                     0.5f,-0.5f, 0.5f,  0.5f,-0.5f,-0.5f, -0.5f,-0.5f,-0.5f,
             };
 
             float cubeNormals[] = {
@@ -166,9 +166,25 @@ void OpenGLViewer::init() {
                 0,-1,0,  0,-1,0,  0,-1,0,
             };
 
+            float cubeScalars[] = {
+                // back face
+                0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                // front face
+                1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+                // left face
+                0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f,
+                // right face
+                0.8f, 0.8f, 0.8f, 0.8f, 0.8f, 0.8f,
+                // top face
+                0.6f, 0.6f, 0.6f, 0.6f, 0.6f, 0.6f,
+                // bottom face
+                0.4f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f,
+            };
+
             glGenVertexArrays(1, &vao);
             glGenBuffers(1, &vbo);
             glGenBuffers(1, &nVbo);
+            glGenBuffers(1, &sVbo);
 
             glBindVertexArray(vao);
 
@@ -181,6 +197,11 @@ void OpenGLViewer::init() {
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeNormals), cubeNormals, GL_DYNAMIC_DRAW);
             glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(1);
+
+            glBindBuffer(GL_ARRAY_BUFFER, sVbo);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeScalars), cubeScalars, GL_DYNAMIC_DRAW);
+            glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 1 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(2);
 
             glBindVertexArray(0);
 
@@ -218,6 +239,9 @@ void OpenGLViewer::init() {
         glBindBuffer(GL_ARRAY_BUFFER, nVbo);
         glBufferData(GL_ARRAY_BUFFER, mD.normals->size() * sizeof(glm::vec3), mD.normals->data(), GL_DYNAMIC_DRAW);
 
+        glBindBuffer(GL_ARRAY_BUFFER, sVbo);
+        glBufferData(GL_ARRAY_BUFFER, mD.scalarField->size() * sizeof(float), mD.scalarField->data(), GL_DYNAMIC_DRAW);
+
         numVertices = mD.pos->size();
     });
 }
@@ -245,6 +269,7 @@ void OpenGLViewer::updateShader() {
     reloadShader = false;
 
     mvpLocation = glGetUniformLocation(shader, "uMVP");
+    colorMapSelectorLocation = glGetUniformLocation(shader, "uColorMap");
 }
 
 void OpenGLViewer::updateViewportSize(int w, int h) {
@@ -255,6 +280,8 @@ void OpenGLViewer::updateViewportSize(int w, int h) {
 
     width = w;
     height = h;
+
+    std::cout << w << " " << h << std::endl;
 
     glBindTexture(GL_TEXTURE_2D, renderTex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
@@ -319,9 +346,37 @@ void OpenGLViewer::update() {
             ImVec2(0, 1),
             ImVec2(1, 0)
         );
+
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
+        ImGui::BeginChild("##Transfer Function", ImVec2(ImGui::GetContentRegionAvail().x, 50.0f), true);
+        ImGui::Text("Visualization Function:");
+        
+        ImGui::SetNextItemWidth(200.0f);
+        if (ImGui::BeginCombo("##Vis Function", transferFuncLabels[int(currentTransferFunc)].c_str())) {
+
+            for (int i = 0; i < int(3); ++i) {
+                bool is_selected = (currentTransferFunc == TransferFunctions(i));
+                if (ImGui::Selectable(transferFuncLabels[i].c_str(), is_selected)) {
+
+                    if (currentTransferFunc != TransferFunctions(i)) {
+
+                    }
+
+                    currentTransferFunc = TransferFunctions(i);
+                }
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
+        ImGui::EndChild(); //Transfer Function
+        ImGui::PopStyleColor();
+
+        ImGui::End(); //View Window
     }
 
-    ImGui::End();
+    
 
 }
 
@@ -340,6 +395,7 @@ void OpenGLViewer::render() {
     glUseProgram(shader);
 
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
+    glUniform1i(colorMapSelectorLocation, currentTransferFunc);
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, numVertices);

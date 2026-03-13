@@ -50,7 +50,7 @@ private:
 	void updateShader();
 	void updateViewportSize(int width, int height);
 
-	GLuint vao, vbo, nVbo;
+	GLuint vao, vbo, nVbo, sVbo;
 
 	int numVertices = 0;
 
@@ -58,4 +58,10 @@ private:
 	glm::mat4 mvp; //Local copy of mvp matrix - update when camera sends event
 
 	float lastScrollY = 0.0f; //TODO: Need better workaround, right now doing dirty way to save time
+
+	GLuint colorMapSelectorLocation;
+	std::string transferFuncLabels[3] = { "Viridis", "Jet", "Turbo" };
+	enum TransferFunctions {
+		Viridis, Jet, Turbo
+	} currentTransferFunc;
 };
