@@ -3,9 +3,7 @@
 #include <string>
 
 #include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include <GLFW/glfw3.h>
+#include <GL/glew.h>
 
 //#include "implot.h"
 
@@ -15,5 +13,7 @@ class Window {
 public:
 
 	using LoopCallback = void(*)();
-	Window(std::string windowTitle, const LoopCallback& loopFunc);
+	using InitCallback = void(*)();
+
+	Window(std::string windowTitle, const InitCallback& initFunc, const LoopCallback& loopFunc);
 };

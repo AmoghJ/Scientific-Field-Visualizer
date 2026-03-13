@@ -1,6 +1,12 @@
 #include "Window.h"
 //#include "Commons.h"
-#include "imgui_internal.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include <stdio.h>
+#define GL_SILENCE_DEPRECATION
+#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+#include <iostream>
+
 #include "Fonts.h"
 
 static void glfw_error_callback(int error, const char* description)
@@ -9,7 +15,7 @@ static void glfw_error_callback(int error, const char* description)
 }
 
 
-Window::Window(std::string windowTitle, const LoopCallback& loopFunc) {
+Window::Window(std::string windowTitle, const InitCallback& initFunc, const LoopCallback& loopFunc) {
 
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit())
@@ -27,11 +33,17 @@ Window::Window(std::string windowTitle, const LoopCallback& loopFunc) {
 	int screenHeight = mode->height;
 
 	// Create window with graphics context
-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "StockApp", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, windowTitle.c_str(), nullptr, nullptr);
 	if (window == nullptr)
 		return;
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // Enable vsync
+
+	glewExperimental = GL_TRUE; // Needed for core profile
+	if (glewInit() != GLEW_OK) {
+		std::cout << "Failed to initialize GLEW" << std::endl;
+		return;
+	}
 
 	//glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);  // No borders, titlebar, etc.
 	glfwSetWindowAttrib(window, GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE); // Make the window transparent
@@ -155,7 +167,7 @@ Window::Window(std::string windowTitle, const LoopCallback& loopFunc) {
 
 	//io.Fonts->Build();
 
-
+	initFunc();
 
 	while (!glfwWindowShouldClose(window)) {
 
