@@ -28,4 +28,5 @@ struct MeshData {
 	std::vector<glm::vec3>* pos;
 	std::vector<glm::vec3>* normals;
 	std::vector<float>* scalarField;
+	std::vector<glm::vec3>* displacement;
 };

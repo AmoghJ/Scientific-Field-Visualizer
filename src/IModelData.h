@@ -5,6 +5,7 @@
 
 #include "Component.h"
 #include "ScalarMaps.h"
+#include "DisplacementMaps.h"
 
 class IModelData : public Component {
 public:
@@ -14,8 +15,10 @@ public:
 	std::vector<glm::vec3> vertexPos;
 	std::vector<glm::vec3> vertexNormal;
 	std::vector<float> scalarField;
+	std::vector<glm::vec3> displacement;
 
-	int selectedFunction = 0;
+	int selectedScalarFunction = 0;
+	int selectedDispFunction = 0;
 
 	virtual void renderGUI() = 0;
 };

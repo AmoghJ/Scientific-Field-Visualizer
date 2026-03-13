@@ -352,7 +352,6 @@ MarchingCubes::~MarchingCubes() {
 
 //TODO: Use compute shaders for marching cube
 //TODO: Displacement overlay
-//TODO: Isoline rendering for user defined values
 void MarchingCubes::updateMarchingCube() {
 
     vertexPos.clear();
@@ -458,16 +457,53 @@ void MarchingCubes::updateMarchingCube() {
             }
         }
     }
+
+    updateScalarField();
+    updateDispField();
 }
 
 void MarchingCubes::updateScalarField() {
 
     scalarField.clear();
-    ScalarFunc scalarFunction = functionsArray[selectedFunction];
+    ScalarFunc scalarFunction = scalarFunctionsArray[selectedScalarFunction];
+
+    //Special case to visualize displacement
+    if (selectedScalarFunction == 7) {
+        DispFunc dispFunction = dispFunctionsArray[selectedDispFunction];
+        float maxLen = 0.0f;
+
+        // first pass — find max for normalization
+        std::vector<float> lengths;
+        for (glm::vec3& p : vertexPos) {
+            float len = glm::length(dispFunction(p));
+            lengths.push_back(len);
+            maxLen = glm::max(maxLen, len);
+        }
+
+        // second pass — normalize to [0,1]
+        for (float len : lengths) {
+            scalarField.push_back(maxLen > 0.0f ? len / maxLen : 0.0f);
+        }
+        return;
+    }
 
     for (glm::vec3& p : vertexPos) {
         scalarField.push_back(scalarFunction(p));
     }
+}
+
+void MarchingCubes::updateDispField() {
+
+    displacement.clear();
+    DispFunc dispFunction = dispFunctionsArray[selectedDispFunction];
+
+    for (glm::vec3& p : vertexPos) {
+        displacement.push_back(dispFunction(p));
+    }
+
+    //Update scalar field if we are visualizing displacement
+    if (selectedScalarFunction == 7)
+        updateScalarField();
 }
 
 void MarchingCubes::renderGUI() {
@@ -502,30 +538,53 @@ void MarchingCubes::renderGUI() {
             std::string(" using marching cubes..."));
 
         updateMarchingCube();
-        updateScalarField();
 
         Console::Log(std::string("Finished generating ") + 
             std::string(generatorLabels[currentGenerator])); //TODO: Add time taken to finish
 
         //Notify main component that we have finished loading mesh
-        Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField));
+        Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
     }
 
     ImGui::Spacing();
     ImGui::Separator();
     ImGui::Spacing();
 
-    ImGui::Text("Field Function");
-    if (ImGui::BeginCombo("##Select Field Function", scalarFuncLabels[int(selectedFunction)].c_str())) {
+    ImGui::Text("Scalar Function");
+    if (ImGui::BeginCombo("##Select Field Function", scalarFuncLabels[int(selectedScalarFunction)].c_str())) {
 
-        for (int i = 0; i < int(7); ++i) {
-            bool is_selected = (selectedFunction == i);
+        for (int i = 0; i < int(8); ++i) {
+            bool is_selected = (selectedScalarFunction == i);
             if (ImGui::Selectable(scalarFuncLabels[i].c_str(), is_selected)) {
 
-                if (selectedFunction != i) {
-                    selectedFunction = i;
+                if (selectedScalarFunction != i) {
+                    selectedScalarFunction = i;
                     updateScalarField();
-                    Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField));
+                    Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
+                }
+
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::Spacing();
+
+    ImGui::Text("Displacement Function");
+    if (ImGui::BeginCombo("##Select Disp Function", dispFuncLabels[int(selectedDispFunction)].c_str())) {
+
+        for (int i = 0; i < int(8); ++i) {
+            bool is_selected = (selectedDispFunction == i);
+            if (ImGui::Selectable(dispFuncLabels[i].c_str(), is_selected)) {
+
+                if (selectedDispFunction != i) {
+                    selectedDispFunction = i;
+                    updateDispField();
+                    Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
                 }
 
             }

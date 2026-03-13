@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\Console.cpp" />
     <ClCompile Include="src\Context_Container.cpp" />
+    <ClCompile Include="src\DisplacementMaps.cpp" />
     <ClCompile Include="src\FileModelLoader.cpp" />
     <ClCompile Include="src\Font.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="src\Console.h" />
     <ClInclude Include="src\Container.h" />
     <ClInclude Include="src\Context_Container.h" />
+    <ClInclude Include="src\DisplacementMaps.h" />
     <ClInclude Include="src\Events.h" />
     <ClInclude Include="src\FileModelLoader.h" />
     <ClInclude Include="src\FileMonitor.h" />

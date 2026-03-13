@@ -50,7 +50,7 @@ private:
 	void updateShader();
 	void updateViewportSize(int width, int height);
 
-	GLuint vao, vbo, nVbo, sVbo;
+	GLuint vao, vbo, nVbo, sVbo, dVbo;
 
 	int numVertices = 0;
 
@@ -74,4 +74,7 @@ private:
 	bool showIsoline = false;
 	float isolineValue = 0.5f;
 	GLuint isolineBoolLocation, isolineValueLocation;
+
+	float dispScale = 0.0f;
+	GLuint displacementScaleLocation;
 };

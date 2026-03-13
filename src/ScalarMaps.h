@@ -6,8 +6,8 @@
 
 using ScalarFunc = std::function<float(glm::vec3)>;
 
-extern std::string scalarFuncLabels[7];
-extern ScalarFunc functionsArray[7];
+extern std::string scalarFuncLabels[8];
+extern ScalarFunc scalarFunctionsArray[8];
 
 // Sine ripples from center
 extern ScalarFunc sinRipples;
@@ -29,3 +29,5 @@ extern ScalarFunc polarAngle;
 
 // Checkerboard 3D
 extern ScalarFunc checkboard;
+
+extern ScalarFunc disp;

@@ -1,13 +1,14 @@
 #include "ScalarMaps.h"
 
-std::string scalarFuncLabels[7]{
+std::string scalarFuncLabels[8]{
 	"Sine Ripples",
 	"Product Bands",
 	"Twisted Bands",
 	"Concentric Shells",
 	"Diagonal Gradient",
 	"Polar Angle",
-	"Checkerboard"
+	"Checkerboard",
+	"Displacement"
 };
 
 // Sine ripples from center
@@ -52,12 +53,17 @@ ScalarFunc checkboard = [](glm::vec3 p) -> float {
 	return ((ix + iy + iz) % 2 == 0) ? 1.0f : 0.0f;
 	};
 
-ScalarFunc functionsArray[7] = {
+ScalarFunc disp = [](glm::vec3 p) -> float {
+	return 1.0f;
+};
+
+ScalarFunc scalarFunctionsArray[8] = {
 	sinRipples,
 	productBands,
 	twistedBands,
 	concShells,
 	diagonalGrad,
 	polarAngle,
-	checkboard
+	checkboard,
+	disp
 };

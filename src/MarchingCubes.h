@@ -24,6 +24,7 @@ class MarchingCubes : public IModelData {
 
 	void updateMarchingCube();
 	void updateScalarField(); //Helper to only update scalar field
+	void updateDispField(); //Helper to only update displacement field
 
 public:
 	MarchingCubes(Container* cont);

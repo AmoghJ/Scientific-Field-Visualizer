@@ -181,10 +181,32 @@ void OpenGLViewer::init() {
                 0.4f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f,
             };
 
+            float cubeDisplacement[] = {
+                // back face
+                0,0,-1,  0,0,-1,  0,0,-1,
+                0,0,-1,  0,0,-1,  0,0,-1,
+                // front face
+                0,0,1,   0,0,1,   0,0,1,
+                0,0,1,   0,0,1,   0,0,1,
+                // left face
+                -1,0,0,  -1,0,0,  -1,0,0,
+                -1,0,0,  -1,0,0,  -1,0,0,
+                // right face
+                1,0,0,   1,0,0,   1,0,0,
+                1,0,0,   1,0,0,   1,0,0,
+                // top face
+                0,1,0,   0,1,0,   0,1,0,
+                0,1,0,   0,1,0,   0,1,0,
+                // bottom face
+                0,-1,0,  0,-1,0,  0,-1,0,
+                0,-1,0,  0,-1,0,  0,-1,0,
+            };
+
             glGenVertexArrays(1, &vao);
             glGenBuffers(1, &vbo);
             glGenBuffers(1, &nVbo);
             glGenBuffers(1, &sVbo);
+            glGenBuffers(1, &dVbo);
 
             glBindVertexArray(vao);
 
@@ -202,6 +224,11 @@ void OpenGLViewer::init() {
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeScalars), cubeScalars, GL_DYNAMIC_DRAW);
             glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 1 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(2);
+
+            glBindBuffer(GL_ARRAY_BUFFER, dVbo);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeDisplacement), cubeDisplacement, GL_DYNAMIC_DRAW);
+            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(3);
 
             glBindVertexArray(0);
 
@@ -242,6 +269,9 @@ void OpenGLViewer::init() {
         glBindBuffer(GL_ARRAY_BUFFER, sVbo);
         glBufferData(GL_ARRAY_BUFFER, mD.scalarField->size() * sizeof(float), mD.scalarField->data(), GL_DYNAMIC_DRAW);
 
+        glBindBuffer(GL_ARRAY_BUFFER, dVbo);
+        glBufferData(GL_ARRAY_BUFFER, mD.displacement->size() * sizeof(glm::vec3), mD.displacement->data(), GL_DYNAMIC_DRAW);
+
         numVertices = mD.pos->size();
     });
 }
@@ -269,12 +299,15 @@ void OpenGLViewer::updateShader() {
     reloadShader = false;
 
     mvpLocation = glGetUniformLocation(shader, "uMVP");
+    displacementScaleLocation = glGetUniformLocation(shader, "uDisplacementScale");
+
     colorMapSelectorLocation = glGetUniformLocation(shader, "uColorMap");
     wireframeToggleLocation = glGetUniformLocation(shader, "uWireframe");
     rangeMinLocation = glGetUniformLocation(shader, "uRangeMin");
     rangeMaxLocation = glGetUniformLocation(shader, "uRangeMax");
     isolineBoolLocation = glGetUniformLocation(shader, "uIsoline");
     isolineValueLocation = glGetUniformLocation(shader, "uIsolineValue");
+    
 }
 
 void OpenGLViewer::updateViewportSize(int w, int h) {
@@ -407,6 +440,13 @@ void OpenGLViewer::update() {
         ImGui::Text("|");
         ImGui::SameLine(0.0f, 25.0f);
 
+        ImGui::SetNextItemWidth(150.0f);
+        ImGui::SliderFloat("Displacement Scale", &dispScale, 0.0f, 2.0f, "%.2f");
+
+        ImGui::SameLine(0.0f, 25.0f);
+        ImGui::Text("|");
+        ImGui::SameLine(0.0f, 25.0f);
+
         ImGui::Checkbox("Wireframe", &wireframe);
 
         ImGui::EndChild(); //Transfer Function
@@ -440,6 +480,7 @@ void OpenGLViewer::render() {
     glUniform1f(rangeMaxLocation, scalarRange[1]);
     glUniform1i(isolineBoolLocation, showIsoline);
     glUniform1f(isolineValueLocation, isolineValue);
+    glUniform1f(displacementScaleLocation, dispScale);
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, numVertices);
