@@ -54,8 +54,7 @@ cd your-repo
 2. Open `ScientificVisualizer.sln` in Visual Studio 2022
 3. Set vcpkg toolchain in project properties if not auto-detected
 4. Build → Release x64
-5. Copy shader files, fonts, and imgui.ini from /x64/Release folder and also maintain the folder structure
-6. Run
+5. Run
 
 **Controls:**
 
