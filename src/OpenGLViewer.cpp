@@ -126,44 +126,44 @@ void OpenGLViewer::init() {
         {
             float cubeVertices[] = {
                 // back face
-                -0.5f,-0.5f,-0.5f,  0.5f,-0.5f,-0.5f,  0.5f, 0.5f,-0.5f,
-                 0.5f, 0.5f,-0.5f, -0.5f, 0.5f,-0.5f, -0.5f,-0.5f,-0.5f,
-                 // front face
-                 -0.5f,-0.5f, 0.5f,  0.5f, 0.5f, 0.5f,  0.5f,-0.5f, 0.5f,
-                  0.5f, 0.5f, 0.5f, -0.5f,-0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-                  // left face
-                  -0.5f,-0.5f,-0.5f, -0.5f, 0.5f, 0.5f, -0.5f,-0.5f, 0.5f,
-                  -0.5f, 0.5f, 0.5f, -0.5f,-0.5f,-0.5f, -0.5f, 0.5f,-0.5f,
-                  // right face
-                   0.5f,-0.5f,-0.5f,  0.5f,-0.5f, 0.5f,  0.5f, 0.5f, 0.5f,
-                   0.5f, 0.5f, 0.5f,  0.5f, 0.5f,-0.5f,  0.5f,-0.5f,-0.5f,
-                   // top face
-                   -0.5f, 0.5f,-0.5f,  0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-                    0.5f, 0.5f, 0.5f, -0.5f, 0.5f,-0.5f,  0.5f, 0.5f,-0.5f,
-                    // bottom face
-                    -0.5f,-0.5f,-0.5f, -0.5f,-0.5f, 0.5f,  0.5f,-0.5f, 0.5f,
-                     0.5f,-0.5f, 0.5f,  0.5f,-0.5f,-0.5f, -0.5f,-0.5f,-0.5f,
+                -0.5f,-0.5f,-0.5f,0.0f,  0.5f,-0.5f,-0.5f,0.0f,  0.5f, 0.5f,-0.5f,0.0f,
+                 0.5f, 0.5f,-0.5f,0.0f, -0.5f, 0.5f,-0.5f,0.0f, -0.5f,-0.5f,-0.5f,0.0f,
+                // front face
+                -0.5f,-0.5f, 0.5f,0.0f,  0.5f, 0.5f, 0.5f,0.0f,  0.5f,-0.5f, 0.5f,0.0f,
+                 0.5f, 0.5f, 0.5f,0.0f, -0.5f,-0.5f, 0.5f,0.0f, -0.5f, 0.5f, 0.5f,0.0f,
+                // left face
+                -0.5f,-0.5f,-0.5f,0.0f, -0.5f, 0.5f, 0.5f,0.0f, -0.5f,-0.5f, 0.5f,0.0f,
+                -0.5f, 0.5f, 0.5f,0.0f, -0.5f,-0.5f,-0.5f,0.0f, -0.5f, 0.5f,-0.5f,0.0f,
+                // right face
+                 0.5f,-0.5f,-0.5f,0.0f,  0.5f,-0.5f, 0.5f,0.0f,  0.5f, 0.5f, 0.5f,0.0f,
+                 0.5f, 0.5f, 0.5f,0.0f,  0.5f, 0.5f,-0.5f,0.0f,  0.5f,-0.5f,-0.5f,0.0f,
+                // top face
+                -0.5f, 0.5f,-0.5f,0.0f,  0.5f, 0.5f, 0.5f,0.0f, -0.5f, 0.5f, 0.5f,0.0f,
+                 0.5f, 0.5f, 0.5f,0.0f, -0.5f, 0.5f,-0.5f,0.0f,  0.5f, 0.5f,-0.5f,0.0f,
+                // bottom face
+                -0.5f,-0.5f,-0.5f,0.0f, -0.5f,-0.5f, 0.5f,0.0f,  0.5f,-0.5f, 0.5f,0.0f,
+                 0.5f,-0.5f, 0.5f,0.0f,  0.5f,-0.5f,-0.5f,0.0f, -0.5f,-0.5f,-0.5f,0.0f
             };
 
             float cubeNormals[] = {
                 // back face
-                0,0,-1,  0,0,-1,  0,0,-1,
-                0,0,-1,  0,0,-1,  0,0,-1,
+                0,0,-1,0,  0,0,-1,0,  0,0,-1,0,
+                0,0,-1,0,  0,0,-1,0,  0,0,-1,0,
                 // front face
-                0,0,1,   0,0,1,   0,0,1,
-                0,0,1,   0,0,1,   0,0,1,
+                0,0,1,0,   0,0,1,0,   0,0,1,0,
+                0,0,1,0,   0,0,1,0,   0,0,1,0,
                 // left face
-                -1,0,0,  -1,0,0,  -1,0,0,
-                -1,0,0,  -1,0,0,  -1,0,0,
+                -1,0,0,0,  -1,0,0,0,  -1,0,0,0,
+                -1,0,0,0,  -1,0,0,0,  -1,0,0,0,
                 // right face
-                1,0,0,   1,0,0,   1,0,0,
-                1,0,0,   1,0,0,   1,0,0,
+                1,0,0,0,   1,0,0,0,   1,0,0,0,
+                1,0,0,0,   1,0,0,0,   1,0,0,0,
                 // top face
-                0,1,0,   0,1,0,   0,1,0,
-                0,1,0,   0,1,0,   0,1,0,
+                0,1,0,0,   0,1,0,0,   0,1,0,0,
+                0,1,0,0,   0,1,0,0,   0,1,0,0,
                 // bottom face
-                0,-1,0,  0,-1,0,  0,-1,0,
-                0,-1,0,  0,-1,0,  0,-1,0,
+                0,-1,0,0,  0,-1,0,0,  0,-1,0,0,
+                0,-1,0,0,  0,-1,0,0,  0,-1,0,0
             };
 
             float cubeScalars[] = {
@@ -183,23 +183,23 @@ void OpenGLViewer::init() {
 
             float cubeDisplacement[] = {
                 // back face
-                0,0,-1,  0,0,-1,  0,0,-1,
-                0,0,-1,  0,0,-1,  0,0,-1,
+                0,0,-1,0,  0,0,-1,0,  0,0,-1,0,
+                0,0,-1,0,  0,0,-1,0,  0,0,-1,0,
                 // front face
-                0,0,1,   0,0,1,   0,0,1,
-                0,0,1,   0,0,1,   0,0,1,
+                0,0,1,0,   0,0,1,0,   0,0,1,0,
+                0,0,1,0,   0,0,1,0,   0,0,1,0,
                 // left face
-                -1,0,0,  -1,0,0,  -1,0,0,
-                -1,0,0,  -1,0,0,  -1,0,0,
+                -1,0,0,0,  -1,0,0,0,  -1,0,0,0,
+                -1,0,0,0,  -1,0,0,0,  -1,0,0,0,
                 // right face
-                1,0,0,   1,0,0,   1,0,0,
-                1,0,0,   1,0,0,   1,0,0,
+                1,0,0,0,   1,0,0,0,   1,0,0,0,
+                1,0,0,0,   1,0,0,0,   1,0,0,0,
                 // top face
-                0,1,0,   0,1,0,   0,1,0,
-                0,1,0,   0,1,0,   0,1,0,
+                0,1,0,0,   0,1,0,0,   0,1,0,0,
+                0,1,0,0,   0,1,0,0,   0,1,0,0,
                 // bottom face
-                0,-1,0,  0,-1,0,  0,-1,0,
-                0,-1,0,  0,-1,0,  0,-1,0,
+                0,-1,0,0,  0,-1,0,0,  0,-1,0,0,
+                0,-1,0,0,  0,-1,0,0,  0,-1,0,0
             };
 
             glGenVertexArrays(1, &vao);
@@ -212,12 +212,12 @@ void OpenGLViewer::init() {
 
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_DYNAMIC_DRAW);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+            glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(0);
 
             glBindBuffer(GL_ARRAY_BUFFER, nVbo);
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeNormals), cubeNormals, GL_DYNAMIC_DRAW);
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+            glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(1);
 
             glBindBuffer(GL_ARRAY_BUFFER, sVbo);
@@ -227,7 +227,7 @@ void OpenGLViewer::init() {
 
             glBindBuffer(GL_ARRAY_BUFFER, dVbo);
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeDisplacement), cubeDisplacement, GL_DYNAMIC_DRAW);
-            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+            glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(3);
 
             glBindVertexArray(0);
@@ -258,26 +258,26 @@ void OpenGLViewer::init() {
 
     //Send back mesh data pointers
     Subscribe<GetMeshData>([this](GetMeshData& md) {
-        md.posVbo = &vbo;
-        md.normalVbo = &nVbo;
-        md.scalarVbo = &sVbo;
-        md.dispVbo = &dVbo;
+        md.posVbo = vbo;
+        md.normalVbo = nVbo;
+        md.scalarVbo = sVbo;
+        md.dispVbo = dVbo;
     });
 
     //Subscribe to mesh data event and update buffer
     Subscribe<MeshData>([this](const MeshData& mD) {
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, mD.pos->size() * sizeof(glm::vec3), mD.pos->data(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, mD.pos->size() * sizeof(glm::vec4), mD.pos->data(), GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, nVbo);
-        glBufferData(GL_ARRAY_BUFFER, mD.normals->size() * sizeof(glm::vec3), mD.normals->data(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, mD.normals->size() * sizeof(glm::vec4), mD.normals->data(), GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, sVbo);
         glBufferData(GL_ARRAY_BUFFER, mD.scalarField->size() * sizeof(float), mD.scalarField->data(), GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, dVbo);
-        glBufferData(GL_ARRAY_BUFFER, mD.displacement->size() * sizeof(glm::vec3), mD.displacement->data(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, mD.displacement->size() * sizeof(glm::vec4), mD.displacement->data(), GL_DYNAMIC_DRAW);
 
         numVertices = mD.pos->size();
     });

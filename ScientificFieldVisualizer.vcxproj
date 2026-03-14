@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ComputerShader.cpp" />
     <ClCompile Include="src\Console.cpp" />
     <ClCompile Include="src\Context_Container.cpp" />
     <ClCompile Include="src\DisplacementMaps.cpp" />
@@ -34,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Component.h" />
+    <ClInclude Include="src\ComputeShader.h" />
     <ClInclude Include="src\Console.h" />
     <ClInclude Include="src\Container.h" />
     <ClInclude Include="src\Context_Container.h" />

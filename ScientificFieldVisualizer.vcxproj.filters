@@ -51,6 +51,9 @@
     <ClCompile Include="src\DisplacementMaps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ComputerShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -99,6 +102,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DisplacementMaps.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComputeShader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

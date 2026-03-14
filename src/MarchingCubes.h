@@ -6,6 +6,8 @@
 #include <string>
 #include <map>
 
+#include "gl/glew.h"
+
 class Container;
 
 using GeneratorFunction = std::function<float(glm::vec3)>;
@@ -23,12 +25,17 @@ class MarchingCubes : public IModelData {
 	std::map<Generators, GeneratorFunction> generators;
 
 	void updateMarchingCube();
+	void updateMarchingCubeComputeShader();
+
 	void updateScalarField(); //Helper to only update scalar field
 	void updateDispField(); //Helper to only update displacement field
+
+	GLuint computeProgram, counterSSBO;
 
 public:
 	MarchingCubes(Container* cont);
 	~MarchingCubes();
 
+	void init() override;
 	void renderGUI() override;
 };

@@ -10,6 +10,7 @@ Context::~Context() {
 
 void Context::init() {
 	viewer.init();
+	model.init();
 }
 
 void Context::loop() {

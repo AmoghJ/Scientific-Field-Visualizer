@@ -2,11 +2,15 @@
 
 #include "imgui.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "Console.h"
 
 #include <glm/gtc/constants.hpp>
 
 #include "Events.h"
+
+#include "ComputeShader.h"
 
 //Values for marching cube - taken from paulborke.net
 static int edgeTable[256] = {
@@ -350,6 +354,19 @@ MarchingCubes::~MarchingCubes() {
 
 }
 
+void MarchingCubes::init() {
+
+    //Compile compute shader
+    std::ifstream file("Shaders/MarchingCubes.comp");
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    computeProgram = compileComputeShader(buffer.str());
+
+    std::cout << "Compiled compute shader" << std::endl;
+
+    glGenBuffers(1, &counterSSBO);
+}
+
 //TODO: Use compute shaders for marching cube
 void MarchingCubes::updateMarchingCube() {
 
@@ -438,9 +455,9 @@ void MarchingCubes::updateMarchingCube() {
                     glm::vec3 v2 = vertlist[triTable[cubeindex][i + 1]] - glm::vec3(32.0f);
                     glm::vec3 v3 = vertlist[triTable[cubeindex][i + 2]] - glm::vec3(32.0f);
 
-                    vertexPos.push_back(v1); //subtracting 32 to center vertices to origin
-                    vertexPos.push_back(v2);
-                    vertexPos.push_back(v3);
+                    vertexPos.push_back(glm::vec4(v1.x, v1.y, v1.z, 0.0f)); //subtracting 32 to center vertices to origin
+                    vertexPos.push_back(glm::vec4(v2.x, v2.y, v2.z, 0.0f));
+                    vertexPos.push_back(glm::vec4(v3.x, v3.y, v3.z, 0.0f));
 
                     glm::vec3 n = calcNormal(
                         vertlist[triTable[cubeindex][i]],
@@ -448,9 +465,9 @@ void MarchingCubes::updateMarchingCube() {
                         vertlist[triTable[cubeindex][i + 2]]
                     );
 
-                    vertexNormal.push_back(-n); //Normals were inverted for some reason
-                    vertexNormal.push_back(-n);
-                    vertexNormal.push_back(-n);
+                    vertexNormal.push_back(glm::vec4(-n.x, -n.y, -n.z, 0.0f)); //Normals were inverted for some reason
+                    vertexNormal.push_back(glm::vec4(-n.x, -n.y, -n.z, 0.0f));
+                    vertexNormal.push_back(glm::vec4(-n.x, -n.y, -n.z, 0.0f));
                     
                 }
             }
@@ -459,6 +476,47 @@ void MarchingCubes::updateMarchingCube() {
 
     updateScalarField();
     updateDispField();
+}
+
+void MarchingCubes::updateMarchingCubeComputeShader() {
+
+    GetMeshData mD;
+    Notify<GetMeshData>(mD); //Fetching vbos from openglViewer
+
+    int maxVerts = 64 * 64 * 64 * 5 * 3; //max 5 tris per cell
+    int numVerts = 0;
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, mD.posVbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, maxVerts * sizeof(glm::vec4), nullptr, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, mD.posVbo);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, mD.normalVbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, maxVerts * sizeof(glm::vec4), nullptr, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, mD.normalVbo);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, mD.scalarVbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, maxVerts * sizeof(float), nullptr, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, mD.scalarVbo);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, mD.dispVbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, maxVerts * sizeof(glm::vec4), nullptr, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, mD.dispVbo);
+
+    uint32_t zero = 0;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, counterSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32_t), &zero, GL_DYNAMIC_READ);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, counterSSBO);
+
+    glUseProgram(computeProgram);
+    glDispatchCompute(64 / 8, 64 / 8, 64 / 8);  // 8x8x8 thread groups
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, counterSSBO);
+    uint32_t count;
+    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &count);
+    numVerts = (count) * 3;
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &zero); //Reset counter ssbo to zero
+
 }
 
 void MarchingCubes::updateScalarField() {
@@ -473,8 +531,8 @@ void MarchingCubes::updateScalarField() {
 
         // first pass — find max for normalization
         std::vector<float> lengths;
-        for (glm::vec3& p : vertexPos) {
-            float len = glm::length(dispFunction(p));
+        for (glm::vec4& p : vertexPos) {
+            float len = glm::length(dispFunction(glm::vec3(p.x,p.y,p.z)));
             lengths.push_back(len);
             maxLen = glm::max(maxLen, len);
         }
@@ -486,8 +544,8 @@ void MarchingCubes::updateScalarField() {
         return;
     }
 
-    for (glm::vec3& p : vertexPos) {
-        scalarField.push_back(scalarFunction(p));
+    for (glm::vec4& p : vertexPos) {
+        scalarField.push_back(scalarFunction(glm::vec3(p.x, p.y, p.z)));
     }
 }
 
@@ -496,8 +554,8 @@ void MarchingCubes::updateDispField() {
     displacement.clear();
     DispFunc dispFunction = dispFunctionsArray[selectedDispFunction];
 
-    for (glm::vec3& p : vertexPos) {
-        displacement.push_back(dispFunction(p));
+    for (glm::vec4& p : vertexPos) {
+        displacement.push_back(glm::vec4(dispFunction(glm::vec3(p.x, p.y, p.z)), 0.0f));
     }
 
     //Update scalar field if we are visualizing displacement
@@ -537,6 +595,7 @@ void MarchingCubes::renderGUI() {
             std::string(" using marching cubes..."));
 
         updateMarchingCube();
+        //updateMarchingCubeComputeShader();
 
         Console::Log(std::string("Finished generating ") + 
             std::string(generatorLabels[currentGenerator])); //TODO: Add time taken to finish

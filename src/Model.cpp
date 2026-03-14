@@ -19,6 +19,10 @@ Model::~Model() {
 
 }
 
+void Model::init() {
+    currentModelLoader->init();
+}
+
 //TODO: Add Mesh Statistics
 void Model::guiRender() {
 

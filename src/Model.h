@@ -26,5 +26,6 @@ public:
 	Model(Container* cont);
 	~Model();
 
+	void init();
 	void guiRender();
 };

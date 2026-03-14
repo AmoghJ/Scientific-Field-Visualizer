@@ -26,12 +26,12 @@ struct MouseScrollEvent {
 };
 
 struct MeshData {
-	std::vector<glm::vec3>* pos;
-	std::vector<glm::vec3>* normals;
+	std::vector<glm::vec4>* pos;
+	std::vector<glm::vec4>* normals;
 	std::vector<float>* scalarField;
-	std::vector<glm::vec3>* displacement;
+	std::vector<glm::vec4>* displacement;
 };
 
 struct GetMeshData {
-	GLuint *posVbo, *normalVbo, *scalarVbo, *dispVbo;
+	GLuint posVbo, normalVbo, scalarVbo, dispVbo;
 };

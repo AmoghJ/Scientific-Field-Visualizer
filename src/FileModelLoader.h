@@ -9,5 +9,6 @@ public:
 	FileModelLoader(Container* cont);
 	~FileModelLoader();
 
+	void init() override;
 	void renderGUI() override;
 };

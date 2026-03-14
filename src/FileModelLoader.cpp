@@ -10,6 +10,10 @@ FileModelLoader::~FileModelLoader() {
 
 }
 
+void FileModelLoader::init() {
+
+}
+
 void FileModelLoader::renderGUI() {
 	ImGui::Text("File model loader");
 }
