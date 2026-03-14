@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <chrono>
 #include "Console.h"
 
 #include <glm/gtc/constants.hpp>
@@ -386,7 +387,6 @@ void MarchingCubes::init() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, triTableVbo);
 }
 
-//TODO: Use compute shaders for marching cube
 void MarchingCubes::updateMarchingCube() {
 
     vertexPos.clear();
@@ -631,10 +631,20 @@ void MarchingCubes::renderGUI() {
             std::string(" using marching cubes..."));
 
         //updateMarchingCube();
+
+        glFinish();  // make sure all previous GL commands are done
+        auto start = std::chrono::high_resolution_clock::now();
         updateMarchingCubeComputeShader();
+        glFinish();  // wait for compute shader to finish
+        auto end = std::chrono::high_resolution_clock::now();
+
+        float ms = std::chrono::duration<float, std::milli>(end - start).count();
+        std::stringstream profile;
+        profile << " [" << ms << " ms" << "]";
 
         Console::Log(std::string("Finished generating ") + 
-            std::string(generatorLabels[currentGenerator])); //TODO: Add time taken to finish
+            std::string(generatorLabels[currentGenerator]) +
+            profile.str());
 
         //Notify main component that we have finished loading mesh
         //Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
