@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "GL/glew.h"
 #include <string>
+#include <vector>
 #include <glm/glm.hpp>
 
 #include "FileMonitor.h"
@@ -42,12 +43,17 @@ private:
 	void updateShader();
 	void updateViewportSize(int width, int height);
 
-	GLuint vao, vbo, velVbo, ageVbo;
+	GLuint vao, vbo, velVbo, ageVbo, trailVbo, headVbo;
 
 	int numVertices = 0;
 
-	GLuint mvpLocation;
+	GLuint mvpLocation, trailLengthLocation;
 	glm::mat4 mvp; //Local copy of mvp matrix - update when camera sends event
 
 	float lastScrollY = 0.0f; //TODO: Need better workaround, right now doing dirty way to save time
+
+	const int TRAIL_LENGTH = 128; 
+
+	std::vector<GLint>   firstArray;
+	std::vector<GLsizei> countArray;
 };

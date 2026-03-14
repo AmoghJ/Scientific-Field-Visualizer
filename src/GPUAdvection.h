@@ -28,7 +28,7 @@ private:
 	GLuint computeProgram;
 
 	GLuint timeLocation, deltaTimeLocation, numParticlesLocation,
-		resetLocation, maxAgeLocation, boundsSizeLocation;
+		resetLocation, maxAgeLocation, boundsSizeLocation, trailLengthLocation;
 
 	float time, deltaTime, maxAge = 5.0f;
 

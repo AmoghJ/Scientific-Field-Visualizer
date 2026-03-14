@@ -37,7 +37,8 @@ struct GetMeshData {
 };
 
 struct GetAdvectionData {
-	GLuint posVbo, velVbo, ageVbo;
+	GLuint posVbo, velVbo, ageVbo, trailVbo, headVbo;
+	int trailLength;
 };
 
 struct MeshVertSizeUpdate {

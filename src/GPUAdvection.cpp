@@ -32,6 +32,7 @@ void GPUAdvection::init() {
     maxAgeLocation = glGetUniformLocation(computeProgram, "uMaxAge");
     boundsSizeLocation = glGetUniformLocation(computeProgram, "uBoundsSize");
     resetLocation = glGetUniformLocation(computeProgram, "uReset");
+    trailLengthLocation = glGetUniformLocation(computeProgram, "uTrailLength");
 
     GetAdvectionData mD;
     Notify<GetAdvectionData>(mD);
@@ -44,6 +45,12 @@ void GPUAdvection::init() {
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, mD.ageVbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, _NumVertices * sizeof(float), nullptr, GL_DYNAMIC_COPY);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, mD.trailVbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, _NumVertices * mD.trailLength * sizeof(glm::vec4), nullptr, GL_DYNAMIC_COPY);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, mD.headVbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, _NumVertices * sizeof(int), nullptr, GL_DYNAMIC_COPY);
 
     //Initialize with default settings
     resetAdvection = true;
@@ -58,6 +65,8 @@ void GPUAdvection::runAdvectionPass() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, mD.posVbo);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, mD.velVbo);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, mD.ageVbo);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, mD.trailVbo);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, mD.headVbo);
 
     glUseProgram(computeProgram);
 
@@ -67,6 +76,7 @@ void GPUAdvection::runAdvectionPass() {
     glUniform1f(maxAgeLocation, maxAge);
     glUniform1f(boundsSizeLocation, 32.0f);
     glUniform1i(resetLocation, resetAdvection);
+    glUniform1i(trailLengthLocation, mD.trailLength);
 
     glDispatchCompute(_NumVertices /8, 1, 1);  // 8x8x8 thread groups
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);

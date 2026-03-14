@@ -59,13 +59,24 @@ void Model::guiRender() {
         ImGui::Separator();
         ImGui::Spacing();
 
-        ImGui::Text("Model Stats");
+        if (selectedMeshType == Marching_Cubes) {
+            ImGui::Text("Model Stats");
 
-        std::string vertDisp = "Vertices: " + std::to_string(currentModelLoader->_NumVertices);
-        ImGui::Text(vertDisp.c_str());
+            std::string vertDisp = "Vertices: " + std::to_string(currentModelLoader->_NumVertices);
+            ImGui::Text(vertDisp.c_str());
 
-        std::string faceDisp = "Faces: " + std::to_string(currentModelLoader->_NumVertices * 3);
-        ImGui::Text(faceDisp.c_str());
+            std::string faceDisp = "Faces: " + std::to_string(currentModelLoader->_NumVertices * 3);
+            ImGui::Text(faceDisp.c_str());
+        }
+        else if (selectedMeshType == GPUAdvec) {
+            ImGui::Text("Advection Stats");
+
+            std::string vertDisp = "Vertices: " + std::to_string(currentModelLoader->_NumVertices * 128);
+            ImGui::Text(vertDisp.c_str());
+
+            std::string faceDisp = "Trails: " + std::to_string(currentModelLoader->_NumVertices);
+            ImGui::Text(faceDisp.c_str());
+        }
 
         ImGui::Spacing();
         ImGui::Separator();

@@ -167,6 +167,8 @@ void AdvectionViewer::init() {
             glGenBuffers(1, &vbo);
             glGenBuffers(1, &velVbo);
             glGenBuffers(1, &ageVbo);
+            glGenBuffers(1, &trailVbo);
+            glGenBuffers(1, &headVbo);
 
             glBindVertexArray(vao);
 
@@ -184,6 +186,10 @@ void AdvectionViewer::init() {
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeScalars), cubeScalars, GL_DYNAMIC_DRAW);
             glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 1 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(2);
+
+            glBindBuffer(GL_ARRAY_BUFFER, trailVbo);  // bind SSBO as VBO
+            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0);
+            glEnableVertexAttribArray(3);
 
             glBindVertexArray(0);
 
@@ -216,11 +222,23 @@ void AdvectionViewer::init() {
         md.posVbo = vbo;
         md.velVbo = velVbo;
         md.ageVbo = ageVbo;
+
+        md.trailVbo = trailVbo;
+        md.headVbo = headVbo;
+        md.trailLength = TRAIL_LENGTH;
     });
 
     //Only update numVertices -> for computer shaders
     Subscribe<MeshVertSizeUpdate>([this](const MeshVertSizeUpdate& ms) {
         numVertices = ms.numVertices;
+
+        firstArray.resize(numVertices);
+        countArray.resize(numVertices);
+
+        for (int i = 0; i < numVertices; i++) {
+            firstArray[i] = i * TRAIL_LENGTH;
+            countArray[i] = TRAIL_LENGTH;
+        }
     });
 }
 
@@ -247,6 +265,7 @@ void AdvectionViewer::updateShader() {
     reloadShader = false;
 
     mvpLocation = glGetUniformLocation(shader, "uMVP");
+    trailLengthLocation = glGetUniformLocation(shader, "uTrailLength");
 }
 
 void AdvectionViewer::updateViewportSize(int w, int h) {
@@ -383,9 +402,11 @@ void AdvectionViewer::render() {
     glUseProgram(shader);
 
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
+    glUniform1i(trailLengthLocation, TRAIL_LENGTH);
 
     glBindVertexArray(vao);
-    glDrawArrays(GL_POINTS, 0, numVertices);
+    //glDrawArrays(GL_POINTS, 0, numVertices);
+    glMultiDrawArrays(GL_LINE_STRIP, firstArray.data(), countArray.data(), numVertices);
     glBindVertexArray(0); 
 
     glUseProgram(0);
