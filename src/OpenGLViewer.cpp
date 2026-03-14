@@ -412,7 +412,7 @@ void OpenGLViewer::update() {
         ImGui::SetNextItemWidth(80.0f);
         if (ImGui::BeginCombo("Visualization", transferFuncLabels[int(currentTransferFunc)].c_str())) {
 
-            for (int i = 0; i < int(3); ++i) {
+            for (int i = 0; i < int(8); ++i) {
                 bool is_selected = (currentTransferFunc == TransferFunctions(i));
                 if (ImGui::Selectable(transferFuncLabels[i].c_str(), is_selected)) {
 

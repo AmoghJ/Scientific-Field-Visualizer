@@ -60,9 +60,10 @@ private:
 	float lastScrollY = 0.0f; //TODO: Need better workaround, right now doing dirty way to save time
 
 	GLuint colorMapSelectorLocation;
-	std::string transferFuncLabels[3] = { "Viridis", "Jet", "Turbo" };
+	std::string transferFuncLabels[8] = { "Viridis", "Jet", "Plasma", 
+					"Inferno", "Hot", "CoolWarm", "Rainbow", "Magma"};
 	enum TransferFunctions {
-		Viridis, Jet, Turbo
+		Viridis, Jet, Plasma, Inferno, Hot, CoolWarm, Rainbow, Magma
 	} currentTransferFunc;
 
 	bool wireframe = true;
