@@ -330,9 +330,6 @@ glm::vec3 calcNormal(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2) {
 
 MarchingCubes::MarchingCubes(Container* cont) : IModelData(cont) {
 
-    generatorLabels[0] = "Torus";
-    generatorLabels[1] = "Gyroid";
-
     generators.insert({ Torus, [](glm::vec3 p) -> float {
         glm::vec3 centered = p - glm::vec3(32);
         float R = 16.0f, r = 6.0f;
@@ -348,7 +345,7 @@ MarchingCubes::MarchingCubes(Container* cont) : IModelData(cont) {
         return glm::clamp(val * 0.5f + 0.5f, 0.0f, 1.0f);
     }});
 
-    currentGenerator = Torus;
+    currentGenerator = SHoles;
 }
 
 MarchingCubes::~MarchingCubes() {
@@ -368,6 +365,7 @@ void MarchingCubes::init() {
     generatorFuncLocation = glGetUniformLocation(computeProgram, "generatorFunc");
     scalarFuncLocation = glGetUniformLocation(computeProgram, "scalarFunc");
     dispFuncLocation = glGetUniformLocation(computeProgram, "dispFunc");
+    isolevelLocation = glGetUniformLocation(computeProgram, "isolevel");
 
     glGenBuffers(1, &counterSSBO);
     
@@ -385,6 +383,9 @@ void MarchingCubes::init() {
             flatTriTable.push_back(triTable[i][j]);
     glBufferData(GL_SHADER_STORAGE_BUFFER, flatTriTable.size() * sizeof(int), flatTriTable.data(), GL_STATIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, triTableVbo);
+
+    //Initialize with default settings
+    updateMarchingCubeComputeShader();
 }
 
 void MarchingCubes::updateMarchingCube() {
@@ -538,6 +539,7 @@ void MarchingCubes::updateMarchingCubeComputeShader() {
 
     glUniform1f(cellSizeLocation, step);
     glUniform1i(gridSizeLocation, gridSize);
+    glUniform1f(isolevelLocation, isolevel);
     glUniform1i(generatorFuncLocation, (int)currentGenerator);
     glUniform1i(scalarFuncLocation, selectedScalarFunction);
     glUniform1i(dispFuncLocation, selectedDispFunction);
@@ -607,7 +609,7 @@ void MarchingCubes::renderGUI() {
     ImGui::SetNextItemWidth(-FLT_MIN);
     if (ImGui::BeginCombo("##Select Procedural Object", generatorLabels[int(currentGenerator)].c_str())) {
 
-        for (int i = 0; i < int(2); ++i) {
+        for (int i = 0; i < int(7); ++i) {
             bool is_selected = (currentGenerator == Generators(i));
             if (ImGui::Selectable(generatorLabels[i].c_str(), is_selected)) {
 
@@ -626,10 +628,12 @@ void MarchingCubes::renderGUI() {
 	ImGui::SliderFloat("Cell Size", &cellSize, 0.1f, 5.0f, "%.2f");
     ImGui::SliderFloat("Isolevel", &isolevel, 0.0f, 1.0f, "%.2f");
 
-    if (ImGui::Button("Generate Mesh")) {
-        Console::Log(std::string("Generating ") + 
-            std::string(generatorLabels[currentGenerator]) +
-            std::string(" using marching cubes..."));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.4f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.5f, 0.1f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.3f, 0.0f, 1.0f));
+
+
+    if (ImGui::Button("Generate Mesh", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 
         //updateMarchingCube();
 
@@ -650,6 +654,8 @@ void MarchingCubes::renderGUI() {
         //Notify main component that we have finished loading mesh
         //Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
     }
+
+    ImGui::PopStyleColor(3);
 
     ImGui::Spacing();
     ImGui::Separator();

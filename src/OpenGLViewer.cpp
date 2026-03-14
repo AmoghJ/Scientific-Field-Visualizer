@@ -473,6 +473,7 @@ void OpenGLViewer::update() {
 
 }
 
+//TODO: Geometry shader to calculate normals
 void OpenGLViewer::render() {
 
     //Reload shader if update is required

@@ -14,12 +14,14 @@ using GeneratorFunction = std::function<float(glm::vec3)>;
 
 class MarchingCubes : public IModelData {
 
-	float cellSize = 1.0f;
-	float isolevel = 0.5f;
+	float cellSize = 0.5f;
+	float isolevel = 0.2f;
 
-	std::string generatorLabels[2];
+	std::string generatorLabels[7] = { "Torus", "Gyroid", "Schwarz P", "Double Torus", 
+	"Sphere Holes", "Trefoil", "Diamond"};
+
 	enum Generators {
-		Torus, Gyroid
+		Torus, Gyroid, Schwarz, DTorus, SHoles, Trefoil, Diamond
 	} currentGenerator;
 
 	std::map<Generators, GeneratorFunction> generators;
@@ -32,7 +34,9 @@ class MarchingCubes : public IModelData {
 
 	GLuint computeProgram, counterSSBO;
 	GLuint edgeTableVbo, triTableVbo;
-	GLuint cellSizeLocation, gridSizeLocation,generatorFuncLocation, scalarFuncLocation, dispFuncLocation;
+	GLuint cellSizeLocation, gridSizeLocation,
+		generatorFuncLocation, scalarFuncLocation, 
+		dispFuncLocation, isolevelLocation;
 
 public:
 	MarchingCubes(Container* cont);

@@ -7,7 +7,7 @@
 Model::Model(Container* cont) : Component(cont) {
 
     meshTypeLabels[0] = "Marching Cubes (procedural)";
-    meshTypeLabels[1] = "Import from file";
+    meshTypeLabels[1] = "File (*not finished)";
 
     loaders.insert({ Marching_Cubes, std::make_unique<MarchingCubes>(cont) });
     loaders.insert({ File, std::make_unique<FileModelLoader>(cont) });

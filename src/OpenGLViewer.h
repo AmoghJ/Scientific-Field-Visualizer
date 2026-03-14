@@ -72,7 +72,7 @@ private:
 	GLuint rangeMinLocation, rangeMaxLocation;
 
 	bool showIsoline = false;
-	float isolineValue = 0.5f;
+	float isolineValue = 0.85f;
 	GLuint isolineBoolLocation, isolineValueLocation;
 
 	float dispScale = 0.0f;
