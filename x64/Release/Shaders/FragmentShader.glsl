@@ -34,22 +34,83 @@ vec3 jet(float t) {
     return vec3(r, g, b);
 }
 
-vec3 turbo(float t) {
+
+vec3 plasma(float t) {
     t = clamp(t, 0.0, 1.0);
-    vec3 c0 = vec3(0.1140, 0.0628, 0.5629);
-    vec3 c1 = vec3(4.7130, 2.1669, -0.0990);
-    vec3 c2 = vec3(-22.0840, -4.5069, 4.3652);
-    vec3 c3 = vec3(40.5980, 5.8073, -8.4520);
-    vec3 c4 = vec3(-35.0640, -5.5530, 6.9110);
-    vec3 c5 = vec3(11.5520, 1.9560, -1.9450);
+    vec3 c0 = vec3(0.0504, 0.0298, 0.5280);
+    vec3 c1 = vec3(2.8776, 0.6138, 1.6276);
+    vec3 c2 = vec3(-2.9938, 2.7779, -6.9460);
+    vec3 c3 = vec3(0.8718, -3.9772, 12.1463);
+    vec3 c4 = vec3(0.5734, 2.4537, -8.8154);
+    vec3 c5 = vec3(-0.3882, -0.8796, 2.2711);
+    return clamp(c0 + t*(c1 + t*(c2 + t*(c3 + t*(c4 + t*c5)))), 0.0, 1.0);
+}
+
+vec3 inferno(float t) {
+    t = clamp(t, 0.0, 1.0);
+    vec3 c0 = vec3(0.0002, 0.0016, 0.0139);
+    vec3 c1 = vec3(0.6226, 0.2285, 1.0587);
+    vec3 c2 = vec3(0.5266, 0.8138, -1.5834);
+    vec3 c3 = vec3(0.8481, -1.7473, 1.4370);
+    vec3 c4 = vec3(-0.5775, 1.1384, -0.1920);
+    vec3 c5 = vec3(0.0000, 0.0000, 0.0000);
+    return clamp(c0 + t*(c1 + t*(c2 + t*(c3 + t*(c4 + t*c5)))), 0.0, 1.0);
+}
+
+
+vec3 hot(float t) {
+    t = clamp(t, 0.0, 1.0);
+    return clamp(vec3(
+        t * 3.0,
+        t * 3.0 - 1.0,
+        t * 3.0 - 2.0
+    ), 0.0, 1.0);
+}
+
+
+vec3 coolwarm(float t) {
+    t = clamp(t, 0.0, 1.0);
+    vec3 cold = vec3(0.085, 0.532, 0.201) * (1.0 - t);
+    vec3 warm = vec3(0.865, 0.865, 0.865) * t;
+    vec3 mid  = vec3(0.085, 0.532, 0.865) * (1.0 - abs(t * 2.0 - 1.0));
+    return clamp(vec3(
+        mix(0.230, 0.706, t),
+        mix(0.299, 0.016, t),
+        mix(0.754, 0.150, t)
+    ), 0.0, 1.0);
+}
+
+
+vec3 rainbow(float t) {
+    t = clamp(t, 0.0, 1.0);
+    float r = abs(t * 6.0 - 3.0) - 1.0;
+    float g = 2.0 - abs(t * 6.0 - 2.0);
+    float b = 2.0 - abs(t * 6.0 - 4.0);
+    return clamp(vec3(r, g, b), 0.0, 1.0);
+}
+
+
+vec3 magma(float t) {
+    t = clamp(t, 0.0, 1.0);
+    vec3 c0 = vec3(0.0016, 0.0002, 0.0139);
+    vec3 c1 = vec3(0.7276, 0.1759, 1.0507);
+    vec3 c2 = vec3(0.2898, 0.9988, -1.3966);
+    vec3 c3 = vec3(0.7277, -1.8416, 1.3925);
+    vec3 c4 = vec3(-0.5757, 1.0951, -0.3077);
+    vec3 c5 = vec3(0.0000, 0.0000, 0.0000);
     return clamp(c0 + t*(c1 + t*(c2 + t*(c3 + t*(c4 + t*c5)))), 0.0, 1.0);
 }
 
 vec3 applyColormap(float t) {
     if (uColorMap == 0) return viridis(t);
     if (uColorMap == 1) return jet(t);
-    if (uColorMap == 2) return turbo(t);
-    return viridis(t);  // default
+    if (uColorMap == 2) return plasma(t);
+    if (uColorMap == 3) return inferno(t);
+    if (uColorMap == 4) return hot(t);
+    if (uColorMap == 5) return coolwarm(t);
+    if (uColorMap == 6) return rainbow(t);
+    if (uColorMap == 7) return magma(t);
+    return jet(t);  // default
 }
 
 void main() {

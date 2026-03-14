@@ -3,7 +3,7 @@
 A real-time GPU-accelerated scientific visualization tool built with C++ and OpenGL. 
 Renders scalar and vector fields over procedural 3D meshes generated via Marching Cubes.
 
-![Demo GIF](media/demo.gif)
+![Demo GIF](Media/demo.gif)
 
 ---
 
@@ -118,7 +118,7 @@ for decoupled communication between modules.
 
 ## Dependencies
 
-- [OpenGL 3.3+](https://www.opengl.org/)
+- [OpenGL 4.3+](https://www.opengl.org/)
 - [GLFW](https://www.glfw.org/)
 - [GLEW](http://glew.sourceforge.net/)
 - [GLM](https://github.com/g-truc/glm)
