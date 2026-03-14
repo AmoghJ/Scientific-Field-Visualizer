@@ -362,9 +362,22 @@ void MarchingCubes::init() {
     buffer << file.rdbuf();
     computeProgram = compileComputeShader(buffer.str());
 
-    std::cout << "Compiled compute shader" << std::endl;
-
     glGenBuffers(1, &counterSSBO);
+    
+
+    glGenBuffers(1, &edgeTableVbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, edgeTableVbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 256 * sizeof(int), edgeTable, GL_STATIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, edgeTableVbo);
+
+    glGenBuffers(1, &triTableVbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, triTableVbo);
+    std::vector<int> flatTriTable;
+    for (int i = 0; i < 256; i++)
+        for (int j = 0; j < 16; j++)
+            flatTriTable.push_back(triTable[i][j]);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, flatTriTable.size() * sizeof(int), flatTriTable.data(), GL_STATIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, triTableVbo);
 }
 
 //TODO: Use compute shaders for marching cube
@@ -507,16 +520,21 @@ void MarchingCubes::updateMarchingCubeComputeShader() {
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32_t), &zero, GL_DYNAMIC_READ);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, counterSSBO);
 
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, edgeTableVbo);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, triTableVbo);
+
     glUseProgram(computeProgram);
     glDispatchCompute(64 / 8, 64 / 8, 64 / 8);  // 8x8x8 thread groups
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, counterSSBO);
     uint32_t count;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, counterSSBO);
     glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &count);
-    numVerts = (count) * 3;
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &zero); //Reset counter ssbo to zero
 
+    numVerts = (count) * 3;
+
+    Notify<MeshVertSizeUpdate>({ numVerts });
 }
 
 void MarchingCubes::updateScalarField() {
@@ -594,14 +612,14 @@ void MarchingCubes::renderGUI() {
             std::string(generatorLabels[currentGenerator]) +
             std::string(" using marching cubes..."));
 
-        updateMarchingCube();
-        //updateMarchingCubeComputeShader();
+        //updateMarchingCube();
+        updateMarchingCubeComputeShader();
 
         Console::Log(std::string("Finished generating ") + 
             std::string(generatorLabels[currentGenerator])); //TODO: Add time taken to finish
 
         //Notify main component that we have finished loading mesh
-        Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
+        //Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
     }
 
     ImGui::Spacing();
@@ -617,8 +635,8 @@ void MarchingCubes::renderGUI() {
 
                 if (selectedScalarFunction != i) {
                     selectedScalarFunction = i;
-                    updateScalarField();
-                    Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
+                    //updateScalarField();
+                    //Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
                 }
 
             }
@@ -641,8 +659,8 @@ void MarchingCubes::renderGUI() {
 
                 if (selectedDispFunction != i) {
                     selectedDispFunction = i;
-                    updateDispField();
-                    Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
+                    //updateDispField();
+                    //Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
                 }
 
             }

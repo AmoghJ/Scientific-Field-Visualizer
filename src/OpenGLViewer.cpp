@@ -264,6 +264,11 @@ void OpenGLViewer::init() {
         md.dispVbo = dVbo;
     });
 
+    //Only update numVertices -> for computer shaders
+    Subscribe<MeshVertSizeUpdate>([this](const MeshVertSizeUpdate& ms) {
+        numVertices = ms.numVertices;
+    });
+
     //Subscribe to mesh data event and update buffer
     Subscribe<MeshData>([this](const MeshData& mD) {
 

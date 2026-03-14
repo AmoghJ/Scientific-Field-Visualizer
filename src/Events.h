@@ -35,3 +35,7 @@ struct MeshData {
 struct GetMeshData {
 	GLuint posVbo, normalVbo, scalarVbo, dispVbo;
 };
+
+struct MeshVertSizeUpdate {
+	int numVertices;
+};

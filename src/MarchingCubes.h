@@ -31,6 +31,7 @@ class MarchingCubes : public IModelData {
 	void updateDispField(); //Helper to only update displacement field
 
 	GLuint computeProgram, counterSSBO;
+	GLuint edgeTableVbo, triTableVbo;
 
 public:
 	MarchingCubes(Container* cont);
