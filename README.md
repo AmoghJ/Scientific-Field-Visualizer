@@ -10,8 +10,7 @@ Renders scalar and vector fields over procedural 3D meshes generated via Marchin
 ## Features
 
 ### Core
-- [x] Procedural mesh generation via Marching Cubes (CPU + GPU compute shader). I chose this approach as I thought it was a good opportunity to demonstrate
-      compute shaders as well. The current architecture can easily allow to add a file importer and render without much change.
+- [x] Procedural mesh generation via Marching Cubes (CPU + GPU compute shader). I chose this approach as I thought it was a good opportunity to demonstrate compute shaders as well. The current architecture can easily allow to add a file importer and render without much change.
 - [x] Per-vertex scalar field visualization with analytical colormap implementation
 - [x] Orbital camera — left drag to orbit, right drag to pan, scroll to zoom
 - [x] Lambertian diffuse shading with per-vertex normals. Smooth normals would have been ideal but has been skipped for now in interest of time.
@@ -24,34 +23,7 @@ Renders scalar and vector fields over procedural 3D meshes generated via Marchin
 ### Level 3
 - [x] Displacement / deformation overlay — per-vertex vector field, GPU deformation in vertex shader
 - [x] Isoline rendering — fragment shader contour lines using fwidth for screen-consistent width
-- [x] GPU Compute Shader — Marching Cubes runs entirely on GPU via compute shader,
-      output written directly to SSBO bound as VBO (zero CPU readback)
-
----
-
-## Mesh Library
-
-| Shape | Description |
-|-------|-------------|
-| Torus | Classic genus-1 surface |
-| Gyroid | Triply periodic minimal surface |
-| Schwarz P | Cubic periodic minimal surface |
-| Double Torus | Union of two interlocked tori |
-| Sphere with Holes | Sphere minus 3 axis-aligned cylinders |
-| Diamond | Diamond cubic TPMS |
-| Trefoil Knot | Knotted surface |
-
-## Scalar Field Library
-
-| Field | Description |
-|-------|-------------|
-| Sine Ripples | Radial waves from center |
-| Product Bands | XYZ sine product |
-| Twisted Bands | Spiral bands around Y axis |
-| Concentric Shells | Distance-based shells |
-| Diagonal Gradient | Turbulent diagonal gradient |
-| Polar Angle | Angular field around Y axis |
-| Checkerboard | 3D checkerboard pattern |
+- [x] GPU Compute Shader — Marching Cubes runs entirely on GPU via compute shader, output written directly to SSBO bound as VBO (zero CPU readback)
 
 ---
 
@@ -115,11 +87,13 @@ This architecture ensures that new features can be easily added without breaking
 
 ## LLM Usage
 
-I used Anthropic's Claude to have conversations and help in navigating some aspects of the projects. With chatbots, my workflow has changed from going to stackoverflow / or the documentation, to directly asking the chatbot. This has saved a lot of time browsing for the right function for the task. It helps tremendously in debugging as well since graphics programming has a lot of lines that require hardcoded values. A single off digit and the whole program doesn't run without throwing an error. These are very difficult to catch, but chatbots are very effective at catching these.
+I used Anthropic's Claude to have conversations and help in navigating some aspects of the projects. With chatbots, my workflow has changed from going to stackoverflow / or the documentation, to directly asking the chatbot. This has saved a lot of time browsing for the right function for the task. It helps tremendously in debugging as well since graphics programming has a lot of lines that require hardcoded values. A single incorrect digit and the whole program doesn't run without throwing an error. These are very difficult to catch, fortunately now chatbots are very effective at catching these.
+
+It also helps to learn new concepts quickly. Eearlier I would have gone on forums to understanda topic - For e.g. I didn't know about the barycentric coordinates trick to render wireframe. But once the AI showed me, I immediately realised how easy and effective it is. What would have probably taken me an hour (most of the time just spent on searching the right information), now takes minutes (the concept is simple to understand).
 
 In my experience, AI is very good at small context related tasks (I used it to generate the orbit camera class, functions for shape generators, scalar fields etc), but lack insight when it comes to large architecture decisions. In the beginning, I had a chat asking if in the context of the assignment, a MVC pattern with a container system would be good? Its reply was that it would be an overkill for the assignment. It thought that I would end up fighting the system rather than developing useful features. However, given the incremental nature of features to be implemented and the complexity of graphics related tasks, my experience told me that a robust architecture in the beginning saves a lot of time debugging and mass confusion later. I decided to stick with my architectural plan and it helped me a lot throughout the project.
 
-Overall, I think one needs a good idea about what are the generic things (such as camera orbiting, transfer functions etc) where the AI probably has a lot of data that it is trained on, vs what are the specific things that need to be done where the AI is more likely to misjudge and human judgement becomes necessary.
+**Overall, I think one needs a good idea about what the generic things are (such as camera orbiting, transfer functions etc) - where the AI probably has a lot of data that it is trained on, as opposed to specific things where the AI is more likely to misjudge and human judgement becomes necessary.**
 
 ---
 
@@ -140,8 +114,6 @@ Overall, I think one needs a good idea about what are the generic things (such a
 7. Normal coordinate space when applying transformations to mesh (currently they are in object space), I skipped this for now since mesh is not transforming. Ideally would setup a scene hierarchy structure with the ability to have parent-child relationship. Internally, the transformations matrices would be applied accordingly and the normals will be transformed to world space.
 
 8. Need better way of sending vbo pointers to model class from render class. I modified the component, container event handling to have non-const value but this is not ideal as it may break things elsewhere.
-
-9. Normal calculation for displaced geometry in geometry shader
 
 ---
 

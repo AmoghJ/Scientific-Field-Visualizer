@@ -33,7 +33,7 @@ GLuint CompileShader(GLenum type, const std::string& source)
     return shader;
 }
 
-GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& fragmentSrc)
+GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& geometrySrc, const std::string& fragmentSrc)
 {
     GLuint vertexShader = CompileShader(GL_VERTEX_SHADER, vertexSrc);
     if (!vertexShader) {
@@ -48,9 +48,17 @@ GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& frag
         return 0;
     }
 
+    GLuint geometryShader = CompileShader(GL_GEOMETRY_SHADER, geometrySrc);
+    if (!geometryShader) {
+        std::cerr << "Geometry shader failed to compile" << std::endl;
+        glDeleteShader(geometryShader);
+        return 0;
+    }
+
     GLuint program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
+    glAttachShader(program, geometryShader);
     glLinkProgram(program);
 
     // Check link status
@@ -64,6 +72,7 @@ GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& frag
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+        glDeleteShader(geometryShader);
         glDeleteProgram(program);
         return 0;
     }
@@ -71,6 +80,7 @@ GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& frag
     // Clean up
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+    glDeleteShader(geometryShader);
 
     return program;
 }
@@ -294,6 +304,7 @@ void OpenGLViewer::updateShader() {
 
     std::ifstream fragShader(shaderDir + "/" + fragShaderName);
     std::ifstream vertShader(shaderDir + "/" + vertShaderName);
+    std::ifstream geomShader(shaderDir + "/" + geomShaderName);
 
     std::stringstream vertBuffer;
     vertBuffer << vertShader.rdbuf();
@@ -301,7 +312,10 @@ void OpenGLViewer::updateShader() {
     std::stringstream fragBuffer;
     fragBuffer << fragShader.rdbuf();
 
-    GLuint newShader = CreateShaderProgram(vertBuffer.str(), fragBuffer.str());
+    std::stringstream geomBuffer;
+    geomBuffer << geomShader.rdbuf();
+
+    GLuint newShader = CreateShaderProgram(vertBuffer.str(), geomBuffer.str(), fragBuffer.str());
     if (newShader != 0) {
         glDeleteProgram(shader); // Only delete old if new is valid
         shader = newShader;

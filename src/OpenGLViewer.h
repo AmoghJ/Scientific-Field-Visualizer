@@ -44,6 +44,7 @@ private:
 	std::string shaderDir = "Shaders";
 	std::string fragShaderName = "FragmentShader.glsl";
 	std::string vertShaderName = "VertexShader.glsl";
+	std::string geomShaderName = "GeometryShader.glsl";
 	FileMonitor vertMonitor, fragMonitor;
 	bool reloadShader = true;
 
