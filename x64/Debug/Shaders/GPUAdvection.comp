@@ -1,0 +1,113 @@
+#version 430
+layout(local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer PositionBuffer {
+    vec4 position[];
+};
+
+layout(std430, binding = 1) buffer VelocityBuffer {
+    vec4 velocity[];
+};
+
+layout(std430, binding = 2) buffer AgeBuffer {
+    float age[];
+};
+
+uniform bool uReset;
+uniform float uDeltaTime;
+uniform float uTime;
+uniform int uNumParticles;
+uniform float uMaxAge;       // try 5.0
+uniform float uBoundsSize;   // try 32.0 — matches your grid
+
+// ── Random ───────────────────────────────────────────
+float rand(vec2 co) {
+    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+vec3 randomPos(uint id) {
+    float x = rand(vec2(id, uTime + 0.1)) * 2.0 - 1.0;
+    float y = rand(vec2(id, uTime + 0.2)) * 2.0 - 1.0;
+    float z = rand(vec2(id, uTime + 0.3)) * 2.0 - 1.0;
+    return vec3(x, y, z) * uBoundsSize;
+}
+
+float randomAge(uint id) {
+    return rand(vec2(id, uTime + 0.9)) * uMaxAge;  // stagger ages so not all die at once
+}
+
+// ── Vector Field ─────────────────────────────────────
+// Lorenz-inspired curl field — chaotic, visually interesting
+vec3 vectorField(vec3 p) {
+    float scale = 0.08;
+    float px = p.x * scale;
+    float py = p.y * scale;
+    float pz = p.z * scale;
+
+    // curl noise — each component is cross-derivative of others
+    vec3 v = vec3(
+        sin(py * 1.3 + pz * 0.7) + cos(pz * 0.9),
+        sin(pz * 1.1 + px * 0.8) + cos(px * 1.2),
+        sin(px * 1.7 + py * 0.5) + cos(py * 0.6)
+    );
+
+    // add time variation for animated flow
+    v += vec3(
+        sin(uTime * 0.3 + py),
+        cos(uTime * 0.2 + pz),
+        sin(uTime * 0.4 + px)
+    ) * 0.3;
+
+    return normalize(v) * 4.0;  // constant speed magnitude
+}
+
+// ── Integrators ──────────────────────────────────────
+vec3 rk2(vec3 pos, float dt) {
+    vec3 k1 = vectorField(pos);
+    vec3 k2 = vectorField(pos + k1 * dt * 0.5);
+    return pos + k2 * dt;
+}
+
+vec3 rk4(vec3 pos, float dt) {
+    vec3 k1 = vectorField(pos);
+    vec3 k2 = vectorField(pos + k1 * dt * 0.5);
+    vec3 k3 = vectorField(pos + k2 * dt * 0.5);
+    vec3 k4 = vectorField(pos + k3 * dt);
+    return pos + (k1 + 2.0*k2 + 2.0*k3 + k4) * dt / 6.0;
+}
+
+// ── Main ─────────────────────────────────────────────
+void main() {
+    uint id = gl_GlobalInvocationID.x;
+    if (id >= uint(uNumParticles)) return;
+
+    // reset — spawn at random position with staggered age
+    if (uReset) {
+        position[id] = vec4(randomPos(id), 1.0);
+        velocity[id] = vec4(vectorField(position[id].xyz), 0.0);
+        age[id]      = randomAge(id);
+        return;
+    }
+
+    vec3 pos     = position[id].xyz;
+    float curAge = age[id];
+
+    // check if particle needs respawning
+    bool outOfBounds = any(greaterThan(abs(pos), vec3(uBoundsSize)));
+    bool tooOld      = curAge >= uMaxAge;
+
+    if (outOfBounds || tooOld) {
+        position[id] = vec4(randomPos(id), 1.0);
+        velocity[id] = vec4(vectorField(position[id].xyz), 0.0);
+        age[id]      = 0.0;
+        return;
+    }
+
+    // advect
+    vec3 newPos = rk4(pos, uDeltaTime);
+    vec3 vel    = vectorField(newPos);
+
+    position[id] = vec4(newPos, 1.0);
+    velocity[id] = vec4(vel, 0.0);
+    age[id]      = curAge + uDeltaTime;
+}

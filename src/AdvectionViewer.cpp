@@ -372,6 +372,8 @@ void AdvectionViewer::render() {
     if (reloadShader)
         updateShader();
 
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
     glBindFramebuffer(GL_FRAMEBUFFER, renderFbo);
     glViewport(0, 0, width, height);
     glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1.0f);
@@ -383,7 +385,7 @@ void AdvectionViewer::render() {
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, numVertices);
+    glDrawArrays(GL_POINTS, 0, numVertices);
     glBindVertexArray(0);
 
     glUseProgram(0);
