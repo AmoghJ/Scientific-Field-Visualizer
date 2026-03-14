@@ -501,6 +501,7 @@ void MarchingCubes::updateMarchingCube() {
 
 void MarchingCubes::updateMarchingCubeComputeShader() {
 
+    Console::Log("Run marching cube");
     GetMeshData mD;
     Notify<GetMeshData>(mD); //Fetching vbos from openglViewer
 
@@ -547,6 +548,9 @@ void MarchingCubes::updateMarchingCubeComputeShader() {
     int groups = (gridSize + 7) / 8;
     glDispatchCompute(groups, groups, groups);  // 8x8x8 thread groups
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+
+    for (int i = 0; i < 7; i++)
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, i, 0);
 
     uint32_t count;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, counterSSBO);

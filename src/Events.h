@@ -45,6 +45,10 @@ struct MeshVertSizeUpdate {
 	int numVertices;
 };
 
+struct AdvectTrailSizeUpdate {
+	int numVertices;
+};
+
 struct ChangedLoader {
 	int loaderIndex;
 };

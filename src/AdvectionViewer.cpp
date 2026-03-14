@@ -227,7 +227,7 @@ void AdvectionViewer::init() {
     });
 
     //Only update numVertices -> for computer shaders
-    Subscribe<MeshVertSizeUpdate>([this](const MeshVertSizeUpdate& ms) {
+    Subscribe<AdvectTrailSizeUpdate>([this](const AdvectTrailSizeUpdate& ms) {
         numVertices = ms.numVertices;
 
         firstArray.resize(numVertices);

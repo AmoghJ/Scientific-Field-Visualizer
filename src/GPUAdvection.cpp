@@ -26,6 +26,8 @@ void GPUAdvection::init() {
 
     _NumVertices = 15000 * 8;
 
+    Notify<AdvectTrailSizeUpdate>({ _NumVertices });
+
     timeLocation = glGetUniformLocation(computeProgram, "uTime");
     deltaTimeLocation = glGetUniformLocation(computeProgram, "uDeltaTime");
     numParticlesLocation = glGetUniformLocation(computeProgram, "uNumParticles");
@@ -76,6 +78,9 @@ void GPUAdvection::runAdvectionPass() {
 
     glDispatchCompute(_NumVertices /8, 1, 1);  // 8x8x8 thread groups
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+
+    for (int i = 0; i < 4; i++)
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, i, 0);
 
     if (resetAdvection)
         resetAdvection = false;
