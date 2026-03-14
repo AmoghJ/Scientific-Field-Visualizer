@@ -3,6 +3,7 @@
 A real-time GPU-accelerated scientific visualization tool built with C++ and OpenGL. 
 Renders scalar and vector fields over procedural 3D meshes generated via Marching Cubes and Compute Shaders.
 
+*The GIF may take some time to load:*
 ![Demo GIF](Media/demo.gif)
 
 ---
