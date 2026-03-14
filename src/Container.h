@@ -16,7 +16,7 @@ public:
     using SubscriptionId = int;
 
     template<typename Event>
-    using Callback = std::function<void(const Event&)>;
+    using Callback = std::function<void(Event&)>;
 
     Container() : nextId(0) {}
 
@@ -36,9 +36,9 @@ public:
     }
 
     template<typename Event>
-    void Notify(const Event& event) const {
-        const auto& subs = GetSubscribers<Event>();
-        for (const auto& [id, cb] : subs) {
+    void Notify(Event& event) {
+        auto& subs = GetSubscribers<Event>();
+        for (auto& [id, cb] : subs) {
             cb(event);
         }
     }

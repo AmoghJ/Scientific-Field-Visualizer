@@ -14,7 +14,8 @@ protected:
     Container* _container;
 
     template<typename Event>
-    using Callback = std::function<void(const Event&)>;
+    using Callback = std::function<void(Event&)>;
+
 
     template<typename Event>
     void Subscribe(Callback<Event> cb) {
@@ -22,7 +23,12 @@ protected:
     }
 
     template<typename Event>
-    void Notify(const Event& event) const {
+    void Notify(Event& event) {
+        _container->Notify(event);
+    }
+
+    template<typename Event>
+    void Notify(const Event& event) {
         _container->Notify(event);
     }
 

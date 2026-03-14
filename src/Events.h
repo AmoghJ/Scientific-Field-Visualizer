@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "glm/glm.hpp"
+#include "gl/glew.h"
 
 struct CameraMoveEvent {
 	glm::vec3 position;
@@ -29,4 +30,8 @@ struct MeshData {
 	std::vector<glm::vec3>* normals;
 	std::vector<float>* scalarField;
 	std::vector<glm::vec3>* displacement;
+};
+
+struct GetMeshData {
+	GLuint *posVbo, *normalVbo, *scalarVbo, *dispVbo;
 };

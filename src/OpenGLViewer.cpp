@@ -256,6 +256,13 @@ void OpenGLViewer::init() {
         });
     }
 
+    //Send back mesh data pointers
+    Subscribe<GetMeshData>([this](GetMeshData& md) {
+        md.posVbo = &vbo;
+        md.normalVbo = &nVbo;
+        md.scalarVbo = &sVbo;
+        md.dispVbo = &dVbo;
+    });
 
     //Subscribe to mesh data event and update buffer
     Subscribe<MeshData>([this](const MeshData& mD) {
