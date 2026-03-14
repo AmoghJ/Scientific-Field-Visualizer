@@ -386,7 +386,7 @@ void AdvectionViewer::render() {
 
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, numVertices);
-    glBindVertexArray(0);
+    glBindVertexArray(0); 
 
     glUseProgram(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

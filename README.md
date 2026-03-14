@@ -81,7 +81,7 @@ Before starting a project, I usually start with a sketch and figure out how all 
 - `OrbitCamera` — spherical coordinate camera with MVP rebuild on viewport resize
 - Compute shader pipeline — SSBO output bound directly as VBO, zero CPU readback
 
-This architecture ensures that new features can be easily added without breaking anything. It makes it super easy to debug problems as they are local and there aren't much dependencies that are across the project.
+This architecture ensures that new features can be easily added without breaking anything. It makes it super easy to debug problems as they are local and there aren't much dependencies that are across the project. For e.g - it was really easy to add particle advection on top even though I hadn't planned for it initially.
 
 ---
 

@@ -15,14 +15,13 @@ private:
 	
 	IModelData* currentModelLoader = nullptr;
 
-	std::string meshTypeLabels[3] = {
+	std::string meshTypeLabels[2] = {
 		"Marching Cubes (procedural)",
-		"File (*not finished)",
 		"GPU Particle Advection"
 	};
 
 	enum MeshType {
-		Marching_Cubes, File, GPUAdvec
+		Marching_Cubes, GPUAdvec
 	} selectedMeshType;
 
 	std::map<MeshType, std::unique_ptr<IModelData>> loaders;

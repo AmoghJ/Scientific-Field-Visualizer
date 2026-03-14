@@ -101,7 +101,6 @@ void GPUAdvection::renderGUI() {
 
     if (ImGui::Button("Run Advection", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
         advectionRunning = true;
-        resetAdvection = true;
     }
 
     if (pushedRun)
@@ -115,16 +114,17 @@ void GPUAdvection::renderGUI() {
         pushedStop = true;
     }
 
-    if (ImGui::Button("Stop Advection", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+    if (ImGui::Button("Pause Advection", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
         advectionRunning = false;
-        time = 0.0f;
         deltaTime = 0.0f;
+        timerInitialized = false;
     }
 
     if (pushedStop)
         ImGui::PopStyleColor(3);
 
-    ImGui::Checkbox("Reset Advection", &resetAdvection);
+    if (ImGui::Checkbox("Reset Advection", &resetAdvection))
+        runAdvectionPass(); //To reset immediately
 
     ImGui::SliderFloat("Max Age", &maxAge, 1.0f, 15.0f, "%.2f");
 

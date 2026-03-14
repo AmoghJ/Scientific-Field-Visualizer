@@ -58,7 +58,8 @@ vec3 vectorField(vec3 p) {
         sin(uTime * 0.4 + px)
     ) * 0.3;
 
-    return normalize(v) * 4.0;  // constant speed magnitude
+    //return normalize(v) * 4.0;  // constant speed magnitude
+    return v;
 }
 
 // ── Integrators ──────────────────────────────────────

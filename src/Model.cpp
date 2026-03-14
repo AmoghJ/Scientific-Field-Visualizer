@@ -12,7 +12,7 @@
 Model::Model(Container* cont) : Component(cont) {
 
     loaders.insert({ Marching_Cubes, std::make_unique<MarchingCubes>(cont) });
-    loaders.insert({ File, std::make_unique<FileModelLoader>(cont) });
+    //loaders.insert({ File, std::make_unique<FileModelLoader>(cont) });
     loaders.insert({ GPUAdvec, std::make_unique<GPUAdvection>(cont) });
 
     currentModelLoader = loaders.at(Marching_Cubes).get(); //Default is marching cubes
@@ -38,7 +38,7 @@ void Model::guiRender() {
         ImGui::SetNextItemWidth(-FLT_MIN);
         if (ImGui::BeginCombo("##Model Loader", meshTypeLabels[int(selectedMeshType)].c_str())) {
 
-            for (int i = 0; i < int(3); ++i) {
+            for (int i = 0; i < int(2); ++i) {
                 bool is_selected = (selectedMeshType == MeshType(i));
                 if (ImGui::Selectable(meshTypeLabels[i].c_str(), is_selected)) {
 

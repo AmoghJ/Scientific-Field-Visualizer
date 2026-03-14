@@ -26,7 +26,7 @@ void Context::loop() {
 		viewer.update();
 		viewer.render();
 	}
-	else if (currentLoaderIndex == 2) {
+	else if (currentLoaderIndex == 1) {
 		advViewer.update();
 		advViewer.render();
 	}
