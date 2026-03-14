@@ -23,7 +23,6 @@ void Model::init() {
     currentModelLoader->init();
 }
 
-//TODO: Add Mesh Statistics
 void Model::guiRender() {
 
 	if (ImGui::Begin("Model")) {
@@ -52,6 +51,19 @@ void Model::guiRender() {
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
+
+        ImGui::Text("Model Stats");
+
+        std::string vertDisp = "Vertices: " + std::to_string(currentModelLoader->_NumVertices);
+        ImGui::Text(vertDisp.c_str());
+
+        std::string faceDisp = "Faces: " + std::to_string(currentModelLoader->_NumVertices * 3);
+        ImGui::Text(faceDisp.c_str());
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+
         //Model Loader specific UI
         if(currentModelLoader != nullptr)
             currentModelLoader->renderGUI();

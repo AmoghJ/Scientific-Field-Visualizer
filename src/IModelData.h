@@ -20,6 +20,8 @@ public:
 	int selectedScalarFunction = 2;
 	int selectedDispFunction = 0;
 
+	int _NumVertices = 0;
+
 	virtual void init() = 0;
 	virtual void renderGUI() = 0;
 };

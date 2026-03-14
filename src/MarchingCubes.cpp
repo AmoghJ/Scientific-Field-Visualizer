@@ -493,6 +493,7 @@ void MarchingCubes::updateMarchingCube() {
         }
     }
 
+    _NumVertices = vertexPos.size();
     updateScalarField();
     updateDispField();
 }
@@ -550,9 +551,9 @@ void MarchingCubes::updateMarchingCubeComputeShader() {
     glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &count);
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &zero); //Reset counter ssbo to zero
 
-    numVerts = (count) * 3;
+    _NumVertices = (count) * 3;
 
-    Notify<MeshVertSizeUpdate>({ numVerts });
+    Notify<MeshVertSizeUpdate>({ _NumVertices });
 }
 
 void MarchingCubes::updateScalarField() {
