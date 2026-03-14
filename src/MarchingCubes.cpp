@@ -351,7 +351,6 @@ MarchingCubes::~MarchingCubes() {
 }
 
 //TODO: Use compute shaders for marching cube
-//TODO: Displacement overlay
 void MarchingCubes::updateMarchingCube() {
 
     vertexPos.clear();

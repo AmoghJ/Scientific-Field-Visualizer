@@ -6,7 +6,7 @@ OrbitCamera::OrbitCamera(Container* cont) : Component(cont) {
 
     setPerspective(45.0f, 1280.0f / 720.0f, 0.01f, 1000.0f);
     setTarget(glm::vec3(0.0f));    // orbit around world origin
-    setDistance(5.0f);
+    setDistance(32.0f);
     setDistanceLimits(0.5f, 200.0f);
 
     updateView();
