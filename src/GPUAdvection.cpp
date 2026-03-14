@@ -49,9 +49,6 @@ void GPUAdvection::init() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, mD.trailVbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, _NumVertices * mD.trailLength * sizeof(glm::vec4), nullptr, GL_DYNAMIC_COPY);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, mD.headVbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, _NumVertices * sizeof(int), nullptr, GL_DYNAMIC_COPY);
-
     //Initialize with default settings
     resetAdvection = true;
     runAdvectionPass();
@@ -66,7 +63,6 @@ void GPUAdvection::runAdvectionPass() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, mD.velVbo);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, mD.ageVbo);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, mD.trailVbo);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, mD.headVbo);
 
     glUseProgram(computeProgram);
 

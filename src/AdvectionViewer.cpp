@@ -168,7 +168,6 @@ void AdvectionViewer::init() {
             glGenBuffers(1, &velVbo);
             glGenBuffers(1, &ageVbo);
             glGenBuffers(1, &trailVbo);
-            glGenBuffers(1, &headVbo);
 
             glBindVertexArray(vao);
 
@@ -224,7 +223,6 @@ void AdvectionViewer::init() {
         md.ageVbo = ageVbo;
 
         md.trailVbo = trailVbo;
-        md.headVbo = headVbo;
         md.trailLength = TRAIL_LENGTH;
     });
 

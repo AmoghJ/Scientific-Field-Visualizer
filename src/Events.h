@@ -37,7 +37,7 @@ struct GetMeshData {
 };
 
 struct GetAdvectionData {
-	GLuint posVbo, velVbo, ageVbo, trailVbo, headVbo;
+	GLuint posVbo, velVbo, ageVbo, trailVbo;
 	int trailLength;
 };
 

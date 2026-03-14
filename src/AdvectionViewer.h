@@ -43,7 +43,7 @@ private:
 	void updateShader();
 	void updateViewportSize(int width, int height);
 
-	GLuint vao, vbo, velVbo, ageVbo, trailVbo, headVbo;
+	GLuint vao, vbo, velVbo, ageVbo, trailVbo;
 
 	int numVertices = 0;
 
