@@ -53,22 +53,18 @@ vec3 vectorField(vec3 p) {
     float py = p.y * scale;
     float pz = p.z * scale;
 
-    // curl noise — each component is cross-derivative of others
+    float t1 = uTime * 0.4;
+    float t2 = uTime * 0.3;
+    float t3 = uTime * 0.5;
+
+    //Curl with time variation
     vec3 v = vec3(
-        sin(py * 1.3 + pz * 0.7) + cos(pz * 0.9),
-        sin(pz * 1.1 + px * 0.8) + cos(px * 1.2),
-        sin(px * 1.7 + py * 0.5) + cos(py * 0.6)
+        sin(py * 1.3 + pz * 0.7 + t1) + cos(pz * 0.9 + t2),
+        sin(pz * 1.1 + px * 0.8 + t2) + cos(px * 1.2 + t3),
+        sin(px * 1.7 + py * 0.5 + t3) + cos(py * 0.6 + t1)
     );
 
-    // add time variation for animated flow
-    v += vec3(
-        sin(uTime * 0.3 + py),
-        cos(uTime * 0.2 + pz),
-        sin(uTime * 0.4 + px)
-    ) * 0.3;
-
-    //return normalize(v) * 4.0;  // constant speed magnitude
-    return v;
+    return v * 2.0;
 }
 
 // ── Integrators ──────────────────────────────────────
