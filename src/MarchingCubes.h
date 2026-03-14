@@ -32,6 +32,7 @@ class MarchingCubes : public IModelData {
 
 	GLuint computeProgram, counterSSBO;
 	GLuint edgeTableVbo, triTableVbo;
+	GLuint cellSizeLocation, gridSizeLocation,generatorFuncLocation, scalarFuncLocation, dispFuncLocation;
 
 public:
 	MarchingCubes(Container* cont);

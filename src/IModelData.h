@@ -17,7 +17,7 @@ public:
 	std::vector<float> scalarField;
 	std::vector<glm::vec4> displacement;
 
-	int selectedScalarFunction = 0;
+	int selectedScalarFunction = 2;
 	int selectedDispFunction = 0;
 
 	virtual void init() = 0;

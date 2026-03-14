@@ -362,6 +362,12 @@ void MarchingCubes::init() {
     buffer << file.rdbuf();
     computeProgram = compileComputeShader(buffer.str());
 
+    cellSizeLocation = glGetUniformLocation(computeProgram, "cellSize");
+    gridSizeLocation = glGetUniformLocation(computeProgram, "gridSize");
+    generatorFuncLocation = glGetUniformLocation(computeProgram, "generatorFunc");
+    scalarFuncLocation = glGetUniformLocation(computeProgram, "scalarFunc");
+    dispFuncLocation = glGetUniformLocation(computeProgram, "dispFunc");
+
     glGenBuffers(1, &counterSSBO);
     
 
@@ -523,8 +529,20 @@ void MarchingCubes::updateMarchingCubeComputeShader() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, edgeTableVbo);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, triTableVbo);
 
+    float step = cellSize;
+    int gridSize = int(64.0f / step);
+    gridSize = glm::max(gridSize, 1);
+
     glUseProgram(computeProgram);
-    glDispatchCompute(64 / 8, 64 / 8, 64 / 8);  // 8x8x8 thread groups
+
+    glUniform1f(cellSizeLocation, step);
+    glUniform1i(gridSizeLocation, gridSize);
+    glUniform1i(generatorFuncLocation, (int)currentGenerator);
+    glUniform1i(scalarFuncLocation, selectedScalarFunction);
+    glUniform1i(dispFuncLocation, selectedDispFunction);
+
+    int groups = (gridSize + 7) / 8;
+    glDispatchCompute(groups, groups, groups);  // 8x8x8 thread groups
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
 
     uint32_t count;
@@ -637,6 +655,7 @@ void MarchingCubes::renderGUI() {
                     selectedScalarFunction = i;
                     //updateScalarField();
                     //Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
+                    updateMarchingCubeComputeShader();
                 }
 
             }
@@ -661,6 +680,7 @@ void MarchingCubes::renderGUI() {
                     selectedDispFunction = i;
                     //updateDispField();
                     //Notify<MeshData>(MeshData(&vertexPos, &vertexNormal, &scalarField, &displacement));
+                    updateMarchingCubeComputeShader();
                 }
 
             }

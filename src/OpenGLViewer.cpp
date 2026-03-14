@@ -82,6 +82,8 @@ OpenGLViewer::OpenGLViewer(Container* cont) : Component(cont) {
     //default background color - hardcoded for now
     backgroundColor = glm::vec3(0.1f);
 
+    currentTransferFunc = Jet;
+
     //Get camera move events
     Subscribe<CameraMoveEvent>([this](const CameraMoveEvent& cm) {
         mvp = cm.mvp; //Update local mvp
