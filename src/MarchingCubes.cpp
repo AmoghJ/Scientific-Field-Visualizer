@@ -501,7 +501,6 @@ void MarchingCubes::updateMarchingCube() {
 
 void MarchingCubes::updateMarchingCubeComputeShader() {
 
-    Console::Log("Run marching cube");
     GetMeshData mD;
     Notify<GetMeshData>(mD); //Fetching vbos from openglViewer
 
