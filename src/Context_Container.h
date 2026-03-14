@@ -3,6 +3,7 @@
 #include "Container.h"
 
 #include "OpenGLViewer.h"
+#include "AdvectionViewer.h"
 #include "OrbitCamera.h"
 #include "Model.h"
 
@@ -17,8 +18,12 @@
 class Context : public Container {
 private:
 	OpenGLViewer viewer;
+	AdvectionViewer advViewer;
+
 	OrbitCamera camera;
 	Model model;
+
+	int currentLoaderIndex = 0; //To cycle through different views -> 0 = mesh, 2 = advection
 
 public:
 	Context();

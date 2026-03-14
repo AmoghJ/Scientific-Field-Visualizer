@@ -54,6 +54,12 @@
     <ClCompile Include="src\ComputerShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUAdvection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AdvectionViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -105,6 +111,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ComputeShader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GPUAdvection.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AdvectionViewer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,7 @@
 TODOs:
 
 Grabbing input from ImGui is not ideal - right now the mouse input is being grabbed from openglviewer and sent to camera, the camera again sends updated info back
+
 Many hardcoded values for uniforms
 
 Not too happy about IModelData inheriting from component - this is basically so that each model can notify the container that it is done loading the model
@@ -16,3 +17,5 @@ Normal coordinate space when applying transformations to mesh (skipping for now 
 Could expose scale control for field functions
 
 Normal calculation for displaced geometry in geometry shader
+
+Need better way of sending vbo pointers to model class from render class (currently passing through component event bus - non ideal)

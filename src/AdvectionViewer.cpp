@@ -1,4 +1,4 @@
-#include "OpenGLViewer.h"
+#include "AdvectionViewer.h"
 
 #include <string>
 #include <fstream>
@@ -12,28 +12,10 @@
 
 #include "Events.h"
 
-// Standard functions for compiling and creating shaders
-GLuint CompileShader(GLenum type, const std::string& source)
-{
-    GLuint shader = glCreateShader(type);
-    const char* src = source.c_str();
-    glShaderSource(shader, 1, &src, nullptr);
-    glCompileShader(shader);
+//Already defined in OpenglViewer
+extern GLuint CompileShader(GLenum type, const std::string& source);
 
-    // Check compile status
-    GLint success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        char infoLog[512];
-        glGetShaderInfoLog(shader, sizeof(infoLog), nullptr, infoLog);
-        std::cerr << "Shader compilation failed:\n" << infoLog << std::endl;
-    }
-
-    return shader;
-}
-
-GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& geometrySrc, const std::string& fragmentSrc)
+GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& fragmentSrc)
 {
     GLuint vertexShader = CompileShader(GL_VERTEX_SHADER, vertexSrc);
     if (!vertexShader) {
@@ -48,17 +30,9 @@ GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& geom
         return 0;
     }
 
-    GLuint geometryShader = CompileShader(GL_GEOMETRY_SHADER, geometrySrc);
-    if (!geometryShader) {
-        std::cerr << "Geometry shader failed to compile" << std::endl;
-        glDeleteShader(geometryShader);
-        return 0;
-    }
-
     GLuint program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
-    glAttachShader(program, geometryShader);
     glLinkProgram(program);
 
     // Check link status
@@ -72,7 +46,6 @@ GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& geom
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
-        glDeleteShader(geometryShader);
         glDeleteProgram(program);
         return 0;
     }
@@ -80,31 +53,28 @@ GLuint CreateShaderProgram(const std::string& vertexSrc, const std::string& geom
     // Clean up
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-    glDeleteShader(geometryShader);
 
     return program;
 }
 
-OpenGLViewer::OpenGLViewer(Container* cont) : Component(cont) {
+AdvectionViewer::AdvectionViewer(Container* cont) : Component(cont) {
     width = 720;
     height = 720;
 
     //default background color - hardcoded for now
     backgroundColor = glm::vec3(0.1f);
 
-    currentTransferFunc = Jet;
-
     //Get camera move events
     Subscribe<CameraMoveEvent>([this](const CameraMoveEvent& cm) {
         mvp = cm.mvp; //Update local mvp
-    });
+        });
 }
 
-OpenGLViewer::~OpenGLViewer() {
+AdvectionViewer::~AdvectionViewer() {
 
 }
 
-void OpenGLViewer::init() {
+void AdvectionViewer::init() {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -140,21 +110,21 @@ void OpenGLViewer::init() {
                 // back face
                 -0.5f,-0.5f,-0.5f,0.0f,  0.5f,-0.5f,-0.5f,0.0f,  0.5f, 0.5f,-0.5f,0.0f,
                  0.5f, 0.5f,-0.5f,0.0f, -0.5f, 0.5f,-0.5f,0.0f, -0.5f,-0.5f,-0.5f,0.0f,
-                // front face
-                -0.5f,-0.5f, 0.5f,0.0f,  0.5f, 0.5f, 0.5f,0.0f,  0.5f,-0.5f, 0.5f,0.0f,
-                 0.5f, 0.5f, 0.5f,0.0f, -0.5f,-0.5f, 0.5f,0.0f, -0.5f, 0.5f, 0.5f,0.0f,
-                // left face
-                -0.5f,-0.5f,-0.5f,0.0f, -0.5f, 0.5f, 0.5f,0.0f, -0.5f,-0.5f, 0.5f,0.0f,
-                -0.5f, 0.5f, 0.5f,0.0f, -0.5f,-0.5f,-0.5f,0.0f, -0.5f, 0.5f,-0.5f,0.0f,
-                // right face
-                 0.5f,-0.5f,-0.5f,0.0f,  0.5f,-0.5f, 0.5f,0.0f,  0.5f, 0.5f, 0.5f,0.0f,
-                 0.5f, 0.5f, 0.5f,0.0f,  0.5f, 0.5f,-0.5f,0.0f,  0.5f,-0.5f,-0.5f,0.0f,
-                // top face
-                -0.5f, 0.5f,-0.5f,0.0f,  0.5f, 0.5f, 0.5f,0.0f, -0.5f, 0.5f, 0.5f,0.0f,
-                 0.5f, 0.5f, 0.5f,0.0f, -0.5f, 0.5f,-0.5f,0.0f,  0.5f, 0.5f,-0.5f,0.0f,
-                // bottom face
-                -0.5f,-0.5f,-0.5f,0.0f, -0.5f,-0.5f, 0.5f,0.0f,  0.5f,-0.5f, 0.5f,0.0f,
-                 0.5f,-0.5f, 0.5f,0.0f,  0.5f,-0.5f,-0.5f,0.0f, -0.5f,-0.5f,-0.5f,0.0f
+                 // front face
+                 -0.5f,-0.5f, 0.5f,0.0f,  0.5f, 0.5f, 0.5f,0.0f,  0.5f,-0.5f, 0.5f,0.0f,
+                  0.5f, 0.5f, 0.5f,0.0f, -0.5f,-0.5f, 0.5f,0.0f, -0.5f, 0.5f, 0.5f,0.0f,
+                  // left face
+                  -0.5f,-0.5f,-0.5f,0.0f, -0.5f, 0.5f, 0.5f,0.0f, -0.5f,-0.5f, 0.5f,0.0f,
+                  -0.5f, 0.5f, 0.5f,0.0f, -0.5f,-0.5f,-0.5f,0.0f, -0.5f, 0.5f,-0.5f,0.0f,
+                  // right face
+                   0.5f,-0.5f,-0.5f,0.0f,  0.5f,-0.5f, 0.5f,0.0f,  0.5f, 0.5f, 0.5f,0.0f,
+                   0.5f, 0.5f, 0.5f,0.0f,  0.5f, 0.5f,-0.5f,0.0f,  0.5f,-0.5f,-0.5f,0.0f,
+                   // top face
+                   -0.5f, 0.5f,-0.5f,0.0f,  0.5f, 0.5f, 0.5f,0.0f, -0.5f, 0.5f, 0.5f,0.0f,
+                    0.5f, 0.5f, 0.5f,0.0f, -0.5f, 0.5f,-0.5f,0.0f,  0.5f, 0.5f,-0.5f,0.0f,
+                    // bottom face
+                    -0.5f,-0.5f,-0.5f,0.0f, -0.5f,-0.5f, 0.5f,0.0f,  0.5f,-0.5f, 0.5f,0.0f,
+                     0.5f,-0.5f, 0.5f,0.0f,  0.5f,-0.5f,-0.5f,0.0f, -0.5f,-0.5f,-0.5f,0.0f
             };
 
             float cubeNormals[] = {
@@ -193,32 +163,10 @@ void OpenGLViewer::init() {
                 0.4f, 0.4f, 0.4f, 0.4f, 0.4f, 0.4f,
             };
 
-            float cubeDisplacement[] = {
-                // back face
-                0,0,-1,0,  0,0,-1,0,  0,0,-1,0,
-                0,0,-1,0,  0,0,-1,0,  0,0,-1,0,
-                // front face
-                0,0,1,0,   0,0,1,0,   0,0,1,0,
-                0,0,1,0,   0,0,1,0,   0,0,1,0,
-                // left face
-                -1,0,0,0,  -1,0,0,0,  -1,0,0,0,
-                -1,0,0,0,  -1,0,0,0,  -1,0,0,0,
-                // right face
-                1,0,0,0,   1,0,0,0,   1,0,0,0,
-                1,0,0,0,   1,0,0,0,   1,0,0,0,
-                // top face
-                0,1,0,0,   0,1,0,0,   0,1,0,0,
-                0,1,0,0,   0,1,0,0,   0,1,0,0,
-                // bottom face
-                0,-1,0,0,  0,-1,0,0,  0,-1,0,0,
-                0,-1,0,0,  0,-1,0,0,  0,-1,0,0
-            };
-
             glGenVertexArrays(1, &vao);
             glGenBuffers(1, &vbo);
-            glGenBuffers(1, &nVbo);
-            glGenBuffers(1, &sVbo);
-            glGenBuffers(1, &dVbo);
+            glGenBuffers(1, &velVbo);
+            glGenBuffers(1, &ageVbo);
 
             glBindVertexArray(vao);
 
@@ -227,20 +175,15 @@ void OpenGLViewer::init() {
             glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(0);
 
-            glBindBuffer(GL_ARRAY_BUFFER, nVbo);
+            glBindBuffer(GL_ARRAY_BUFFER, velVbo);
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeNormals), cubeNormals, GL_DYNAMIC_DRAW);
             glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(1);
 
-            glBindBuffer(GL_ARRAY_BUFFER, sVbo);
+            glBindBuffer(GL_ARRAY_BUFFER, ageVbo);
             glBufferData(GL_ARRAY_BUFFER, sizeof(cubeScalars), cubeScalars, GL_DYNAMIC_DRAW);
             glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 1 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(2);
-
-            glBindBuffer(GL_ARRAY_BUFFER, dVbo);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(cubeDisplacement), cubeDisplacement, GL_DYNAMIC_DRAW);
-            glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(3);
 
             glBindVertexArray(0);
 
@@ -256,7 +199,7 @@ void OpenGLViewer::init() {
         std::wstring wFilePath = std::wstring(filePath.begin(), filePath.end());
         vertMonitor.beginMonitoring(wFilePath, [this]() {
             reloadShader = true;
-        });
+            });
     }
 
     //Monitor Frag for hot reloading
@@ -265,46 +208,26 @@ void OpenGLViewer::init() {
         std::wstring wFilePath = std::wstring(filePath.begin(), filePath.end());
         fragMonitor.beginMonitoring(wFilePath, [this]() {
             reloadShader = true;
-        });
+            });
     }
 
     //Send back mesh data pointers
-    Subscribe<GetMeshData>([this](GetMeshData& md) {
+    Subscribe<GetAdvectionData>([this](GetAdvectionData& md) {
         md.posVbo = vbo;
-        md.normalVbo = nVbo;
-        md.scalarVbo = sVbo;
-        md.dispVbo = dVbo;
+        md.velVbo = velVbo;
+        md.ageVbo = ageVbo;
     });
 
     //Only update numVertices -> for computer shaders
     Subscribe<MeshVertSizeUpdate>([this](const MeshVertSizeUpdate& ms) {
         numVertices = ms.numVertices;
     });
-
-    //Subscribe to mesh data event and update buffer
-    Subscribe<MeshData>([this](const MeshData& mD) {
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, mD.pos->size() * sizeof(glm::vec4), mD.pos->data(), GL_DYNAMIC_DRAW);
-
-        glBindBuffer(GL_ARRAY_BUFFER, nVbo);
-        glBufferData(GL_ARRAY_BUFFER, mD.normals->size() * sizeof(glm::vec4), mD.normals->data(), GL_DYNAMIC_DRAW);
-
-        glBindBuffer(GL_ARRAY_BUFFER, sVbo);
-        glBufferData(GL_ARRAY_BUFFER, mD.scalarField->size() * sizeof(float), mD.scalarField->data(), GL_DYNAMIC_DRAW);
-
-        glBindBuffer(GL_ARRAY_BUFFER, dVbo);
-        glBufferData(GL_ARRAY_BUFFER, mD.displacement->size() * sizeof(glm::vec4), mD.displacement->data(), GL_DYNAMIC_DRAW);
-
-        numVertices = mD.pos->size();
-    });
 }
 
-void OpenGLViewer::updateShader() {
+void AdvectionViewer::updateShader() {
 
     std::ifstream fragShader(shaderDir + "/" + fragShaderName);
     std::ifstream vertShader(shaderDir + "/" + vertShaderName);
-    std::ifstream geomShader(shaderDir + "/" + geomShaderName);
 
     std::stringstream vertBuffer;
     vertBuffer << vertShader.rdbuf();
@@ -312,10 +235,7 @@ void OpenGLViewer::updateShader() {
     std::stringstream fragBuffer;
     fragBuffer << fragShader.rdbuf();
 
-    std::stringstream geomBuffer;
-    geomBuffer << geomShader.rdbuf();
-
-    GLuint newShader = CreateShaderProgram(vertBuffer.str(), geomBuffer.str(), fragBuffer.str());
+    GLuint newShader = CreateShaderProgram(vertBuffer.str(), fragBuffer.str());
     if (newShader != 0) {
         glDeleteProgram(shader); // Only delete old if new is valid
         shader = newShader;
@@ -327,18 +247,9 @@ void OpenGLViewer::updateShader() {
     reloadShader = false;
 
     mvpLocation = glGetUniformLocation(shader, "uMVP");
-    displacementScaleLocation = glGetUniformLocation(shader, "uDisplacementScale");
-
-    colorMapSelectorLocation = glGetUniformLocation(shader, "uColorMap");
-    wireframeToggleLocation = glGetUniformLocation(shader, "uWireframe");
-    rangeMinLocation = glGetUniformLocation(shader, "uRangeMin");
-    rangeMaxLocation = glGetUniformLocation(shader, "uRangeMax");
-    isolineBoolLocation = glGetUniformLocation(shader, "uIsoline");
-    isolineValueLocation = glGetUniformLocation(shader, "uIsolineValue");
-    
 }
 
-void OpenGLViewer::updateViewportSize(int w, int h) {
+void AdvectionViewer::updateViewportSize(int w, int h) {
 
     //Only run function if update is necessary
     if (w == width && h == height)
@@ -367,7 +278,7 @@ void OpenGLViewer::updateViewportSize(int w, int h) {
 
 static bool dragStartedInViewer = false;
 
-void OpenGLViewer::update() {
+void AdvectionViewer::update() {
 
     //View Window
     {
@@ -405,7 +316,7 @@ void OpenGLViewer::update() {
             }
         }
 
-        
+
         //ImVec2 contentSize = ImGui::GetContentRegionAvail();
         //ImVec2 renderSize = ImVec2(contentSize.x, contentSize.y);
 
@@ -423,7 +334,7 @@ void OpenGLViewer::update() {
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
         ImGui::BeginChild("##Transfer Function", ImVec2(contentSize.x, 38.0f), true);
 
-        ImGui::SetNextItemWidth(80.0f);
+        /*ImGui::SetNextItemWidth(80.0f);
         if (ImGui::BeginCombo("Visualization", transferFuncLabels[int(currentTransferFunc)].c_str())) {
 
             for (int i = 0; i < int(8); ++i) {
@@ -440,42 +351,12 @@ void OpenGLViewer::update() {
                     ImGui::SetItemDefaultFocus();
             }
             ImGui::EndCombo();
-        }
+        }*/
 
         ImGui::SameLine(0.0f, 25.0f);
         ImGui::Text("|");
         ImGui::SameLine(0.0f, 25.0f);
 
-        ImGui::SetNextItemWidth(240.0f);
-        ImGui::DragFloatRange2("Range", &scalarRange[0], &scalarRange[1],
-            0.005f,   // drag speed
-            0.0f,     // min limit
-            1.0f,     // max limit
-            "Min: %.2f", "Max: %.2f");
-
-        ImGui::SameLine(0.0f, 25.0f);
-        ImGui::Text("|");
-        ImGui::SameLine(0.0f, 25.0f);
-
-        ImGui::Checkbox("Isoline", &showIsoline);
-        if (showIsoline) {
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            ImGui::SliderFloat("Value", &isolineValue, 0.0f, 1.0f, "%.2f");
-        }
-
-        ImGui::SameLine(0.0f, 25.0f);
-        ImGui::Text("|");
-        ImGui::SameLine(0.0f, 25.0f);
-
-        ImGui::SetNextItemWidth(150.0f);
-        ImGui::SliderFloat("Displacement Scale", &dispScale, 0.0f, 2.0f, "%.2f");
-
-        ImGui::SameLine(0.0f, 25.0f);
-        ImGui::Text("|");
-        ImGui::SameLine(0.0f, 25.0f);
-
-        ImGui::Checkbox("Wireframe", &wireframe);
 
         ImGui::EndChild(); //Transfer Function
         ImGui::PopStyleColor();
@@ -483,11 +364,9 @@ void OpenGLViewer::update() {
         ImGui::End(); //View Window
     }
 
-    
-
 }
 
-void OpenGLViewer::render() {
+void AdvectionViewer::render() {
 
     //Reload shader if update is required
     if (reloadShader)
@@ -502,13 +381,6 @@ void OpenGLViewer::render() {
     glUseProgram(shader);
 
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
-    glUniform1i(colorMapSelectorLocation, currentTransferFunc);
-    glUniform1i(wireframeToggleLocation, wireframe);
-    glUniform1f(rangeMinLocation, scalarRange[0]);
-    glUniform1f(rangeMaxLocation, scalarRange[1]);
-    glUniform1i(isolineBoolLocation, showIsoline);
-    glUniform1f(isolineValueLocation, isolineValue);
-    glUniform1f(displacementScaleLocation, dispScale);
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, numVertices);
@@ -518,6 +390,6 @@ void OpenGLViewer::render() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-GLuint OpenGLViewer::getTextureID() {
+GLuint AdvectionViewer::getTextureID() {
     return renderTex;
 }

@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AdvectionViewer.cpp" />
     <ClCompile Include="src\ComputerShader.cpp" />
     <ClCompile Include="src\Console.cpp" />
     <ClCompile Include="src\Context_Container.cpp" />
     <ClCompile Include="src\DisplacementMaps.cpp" />
     <ClCompile Include="src\FileModelLoader.cpp" />
     <ClCompile Include="src\Font.cpp" />
+    <ClCompile Include="src\GPUAdvection.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MarchingCubes.cpp" />
     <ClCompile Include="src\Model.cpp" />
@@ -34,6 +36,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AdvectionViewer.h" />
     <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\ComputeShader.h" />
     <ClInclude Include="src\Console.h" />
@@ -44,6 +47,7 @@
     <ClInclude Include="src\FileModelLoader.h" />
     <ClInclude Include="src\FileMonitor.h" />
     <ClInclude Include="src\Fonts.h" />
+    <ClInclude Include="src\GPUAdvection.h" />
     <ClInclude Include="src\IModelData.h" />
     <ClInclude Include="src\MarchingCubes.h" />
     <ClInclude Include="src\Model.h" />

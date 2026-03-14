@@ -3,14 +3,17 @@
 
 #include "MarchingCubes.h"
 #include "FileModelLoader.h"
+#include "GPUAdvection.h"
+
+#include <iostream>
+
+#include "Events.h"
 
 Model::Model(Container* cont) : Component(cont) {
 
-    meshTypeLabels[0] = "Marching Cubes (procedural)";
-    meshTypeLabels[1] = "File (*not finished)";
-
     loaders.insert({ Marching_Cubes, std::make_unique<MarchingCubes>(cont) });
     loaders.insert({ File, std::make_unique<FileModelLoader>(cont) });
+    loaders.insert({ GPUAdvec, std::make_unique<GPUAdvection>(cont) });
 
     currentModelLoader = loaders.at(Marching_Cubes).get(); //Default is marching cubes
 }
@@ -19,8 +22,11 @@ Model::~Model() {
 
 }
 
+//Initialize all models
 void Model::init() {
-    currentModelLoader->init();
+    loaders.at(Marching_Cubes).get()->init();
+    //loaders.at(File).get()->init(); //Nothing to initialize here
+    loaders.at(GPUAdvec).get()->init();
 }
 
 void Model::guiRender() {
@@ -32,12 +38,13 @@ void Model::guiRender() {
         ImGui::SetNextItemWidth(-FLT_MIN);
         if (ImGui::BeginCombo("##Model Loader", meshTypeLabels[int(selectedMeshType)].c_str())) {
 
-            for (int i = 0; i < int(2); ++i) {
+            for (int i = 0; i < int(3); ++i) {
                 bool is_selected = (selectedMeshType == MeshType(i));
                 if (ImGui::Selectable(meshTypeLabels[i].c_str(), is_selected)) {
 
-                    if (selectedMeshType != MeshType(i)) { //TODO: Notify change of meshLoader
+                    if (selectedMeshType != MeshType(i)) {
                         currentModelLoader = loaders.at(MeshType(i)).get();
+                        Notify<ChangedLoader>({ MeshType(i)});
                     }
 
                     selectedMeshType = MeshType(i);

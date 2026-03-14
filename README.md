@@ -115,6 +115,8 @@ In my experience, AI is very good at small context related tasks (I used it to g
 
 8. Need better way of sending vbo pointers to model class from render class. I modified the component, container event handling to have non-const value but this is not ideal as it may break things elsewhere.
 
+9. OpenGLViewer and AdvectionViewer are largely the same classes. I hadn't planned on implementing advection earlier. But there should be an abstract class for the common functionality, and then the derived specialized classes for these viewers (Just like the model). Right now, I have just copy pasted code in interest of time.
+
 ---
 
 ## Dependencies

@@ -36,6 +36,14 @@ struct GetMeshData {
 	GLuint posVbo, normalVbo, scalarVbo, dispVbo;
 };
 
+struct GetAdvectionData {
+	GLuint posVbo, velVbo, ageVbo;
+};
+
 struct MeshVertSizeUpdate {
 	int numVertices;
+};
+
+struct ChangedLoader {
+	int loaderIndex;
 };
